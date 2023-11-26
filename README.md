@@ -12,10 +12,10 @@
 |3 | [Running Your Project in the Browser](#Run-your-Project-in-browser)|
 |4 | [Updating Composer](#Update-Composer)|
 |5 | [Making a Model in Laravel](#Making-a-Model-in-Laravel)|
-|6 | [Creating a Migration File](#Creating-a-Migration-File)|
+|6 | [Creating a Migration File & Migrate the migration file](#Creating-a-Migration-File)|
 |7 | [Generating a Controller File](#Generating-a-Controller-File)|
 |8 | [Understanding Route Lists](#Understanding-Route-Lists)|
-|9 | [Migrating Your Database](#Migrating-Your-Database)|
+|9 | [Migrating & Seed Your Database](#Migrating-&-Seed-Your-Database)|
 |10| [Generating an Application Key](#Generating-an-Application-Key)|
 |11| [Creating a Storage Link](#Creating-a-Storage-Link)|
 |12| [Refreshing Laravel's Memory](#Refreshing-Laravel's-Memory)|
@@ -29,6 +29,7 @@
     ```cmd
    composer global require laravel/installer
     ```
+    This command installs Laravel globally on your system. It allows you to create new Laravel projects using the laravel new command.
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -40,6 +41,7 @@
     ```cmd
    laravel new app_name
     ```
+    This command creates a new Laravel project with the specified name (app_name). It sets up the basic structure and necessary files for a Laravel application.
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -47,14 +49,16 @@
 
 3. ### Run your Project in  browser
     
-    To your project  of Laravel in browser
+    * To your project  of Laravel in browser
     ```cmd
    php artisan serve
     ```
-    And if you want to run your project in different port
+    * And if you want to run your project in different port
    ```cmd
    php artisan serve --port=8080
    ```
+   This command starts the development server, allowing you to access your Laravel application in the browser at http://localhost:8000/. You can specify a different port using --port.
+
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -62,14 +66,18 @@
 
 4. ###  Update Composer 
     
-    To your update composer of project
+    * To your update composer of project
     ```cmd
    composer update
     ```
-    And sometimes we have to ignore some requirements
+    This command starts the development server, allowing you to access your Laravel application in the browser at http://localhost:8000/. You can specify a different port using --port.
+
+
+    * Ignoring Some Requirements during Update
    ```cmd
    composer update --ignore-platform-reqs
    ```
+   In some cases, you might need to update without considering platform requirements. This command allows you to update without checking PHP and extension versions.
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -77,24 +85,42 @@
 
 5. ###  Making a Model in Laravel
     
-    To make a Model file
+    * To make a Model file
     ```cmd
    php artisan make:model modelNAME
     ```
-    And if we want Migration file with Model with one command
+    This command generates a new Eloquent model in the app/Models directory. Models represent database tables and encapsulate business logic related to data.
+   
+    * Creating a Migration File with Model
    ```cmd
    php artisan make:model modelNAME -m
    ```
+   This command not only creates a model but also generates a corresponding database migration file. Migrations define the structure of your database tables.
+
 
 
   **[⬆ Back to Top](#Important-Commands)**  
 
 6. ###  Creating a Migration File
     
-    To Create a Migration File
+    * To Create a Migration File
     ```cmd
    php artisan make:migration create_contacts_table
     ```
+    This command generates a new migration file in the database/migrations directory. Migration files define changes to your database schema.
+   
+    * Migrate the migration file 
+    ```cmd
+   php artisan migrate
+    ```
+    This command applies pending migrations, updating your database schema to match the changes defined in the migration files.
+   
+   * Migrate fresh the migration file 
+    ```cmd
+   php artisan migrate:fresh
+    ```
+    Use this command to rollback all migrations and start fresh. It re-runs all migrations, effectively resetting your database.
+
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -105,30 +131,41 @@
     ```cmd
    php artisan make:controller nameofController --resource
     ```
+    This command creates a new controller with resourceful methods (index, create, store, show, edit, update, destroy). Controllers handle user requests, process data, and interact with models.
 
 
   **[⬆ Back to Top](#Important-Commands)**
    
 8. ###  Understanding Route Lists
     
-    Generate a Controller File
+    Generate a Route List
     ```cmd
    php artisan route:list
     ```
+    This command displays a list of all registered routes for your application. It shows the HTTP methods, URI, controller, and middleware for each route.
 
 
   **[⬆ Back to Top](#Important-Commands)**
    
-9. ###  Migrating Your Database
+9. ###  Migrating & Seed Your Database
     
-    Migrate Your Database
+    * Migrate Your Database
     ```cmd
    php artisan migrate --seed
     ```
-    Migrate fresh your Database
+    `migrate --seed` applies migrations and seeds the database with sample data.
+   
+    * Migrate fresh your Database
    ```cmd
    php artisan migrate:fresh --seed
    ```
+   `migrate:fresh --seed` resets the database, then applies migrations and seeds.
+   
+    * Seed your Database
+   ```cmd
+   php artisan db:seed
+   ```
+   `db:seed` seeds the database without running migrations.
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -139,6 +176,7 @@
     ```cmd
     php artisan key:generate
     ```
+    This command generates a new application key used for encryption and other security-related features in Laravel.
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -150,6 +188,7 @@
     ```cmd
     php artisan storage:link
     ```
+    This command creates a symbolic link from the public/storage directory to the storage/app/public directory. It is used to make file uploads publicly accessible.
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -157,30 +196,35 @@
        
 12. ###  Refreshing Laravel's Memory
     
-    Optimize Project
+    * Optimize Project
     ```cmd
     php artisan optimize:clear
     ```
+    clears the compiled classes and services from the cache.
     
-    Clear cache Project
+    * Clear cache Project
     ```cmd
     php artisan cache:clear
     ```
+    clears the application cache.
           
-    Refresh route Project
+    * Refresh route Project
     ```cmd
     php artisan route:clear
     ```
+    clears the route cache.
         
-    Clear view Project
+    * Clear view Project
     ```cmd
     php artisan view:clear
     ```
+    clears the view cache.
           
-    Clear config Project
+    * Clear config Project
     ```cmd
     php artisan config:clear
     ```
+    clears the configuration cache.
 
 
   **[⬆ Back to Top](#Important-Commands)**
