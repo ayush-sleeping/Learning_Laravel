@@ -157,29 +157,29 @@
        
 12. ###  Refreshing Laravel's Memory
     
-Optimize Project
+    Optimize Project
     ```cmd
-   php artisan optimize:clear
+    php artisan optimize:clear
     ```
     
-Clear cache Project
+    Clear cache Project
     ```cmd
-   php artisan cache:clear
+    php artisan cache:clear
     ```
           
-Refresh route Project
+    Refresh route Project
     ```cmd
-   php artisan route:clear
+    php artisan route:clear
     ```
         
-Clear view Project
+    Clear view Project
     ```cmd
-   php artisan view:clear
+    php artisan view:clear
     ```
           
-Clear config Project
+    Clear config Project
     ```cmd
-   php artisan config:clear
+    php artisan config:clear
     ```
 
 
@@ -194,34 +194,44 @@ across different files and directories. Here's a breakdown of the key
 files and their responsibilities:
 
 
-* Routes: routes/web.php or routes/api.php
+* Routes: routes/web.php or routes/api.php :
+  
   Responsible for defining the routes that map HTTP requests to controller actions.
 
-* Controllers: app/Http/Controllers
+* Controllers: app/Http/Controllers :
+  
   Handle incoming requests, process data, and return the appropriate responses. They orchestrate the application's logic and interact with models.
 
-* Models: app/Models
+* Models: app/Models :
+  
   Represent the data entities of your application. They interact with the database and encapsulate the business logic of the application.
 
-* Views: resources/views
+* Views: resources/views :
+  
   Contain the presentation layer of your application. They define the structure and layout of the HTML pages that are served to the user.
 
-* Migrations: database/migrations
+* Migrations: database/migrations :
+  
   Define the structure of the database tables and handle schema modifications using PHP code. Migrations allow you to create, modify, and delete database tables and their columns.
 
-* Middleware: app/Http/Middleware
+* Middleware: app/Http/Middleware :
+  
   Enable you to filter HTTP requests entering your application. They can perform tasks like authentication, logging, session handling, etc.
 
-* Requests: app/Http/Requests
+* Requests: app/Http/Requests :
+  
   Validate incoming HTTP requests before they reach the controller. They ensure that the data sent by the user is valid and meets the specified criteria.
 
-* Database Seeders: database/seeders
+* Database Seeders: database/seeders :
+  
   Populate the database with dummy data for testing and development purposes.
 
-* Configuration: config
+* Configuration: config :
+  
   Contains various configuration files for the application, including database configuration, cache configuration, and more.
 
-* Views Partials and Layouts: resources/views/partials and resources/views/layouts
+* Views Partials and Layouts: resources/views/partials and resources/views/layouts :
+  
   Include reusable view components and layout templates that can be used across multiple views.
 
 
