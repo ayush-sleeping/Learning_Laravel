@@ -21,6 +21,9 @@
 |12| [Refreshing Laravel's Memory](#Refreshing-Laravel's-Memory)|
 |13| [Understanding CRUD Project Flow](#Understanding-CRUD-Project-Flow)|
 |14| [Laravel Request Lifecycle](#Laravel-Request-LifeCycle)|
+|15| [Overview of Laravel Versions in recent years](#Laravel-versions-lately)|
+|16| [Artisan Console](#Artisan-Console)|
+
 
 
 <br>
@@ -505,7 +508,167 @@ Returns a response (```HTML/JSON/Redirect```)
     
 
        
-15. ###  Laravel Request LifeCycle
+15. ###  Laravel versions lately
+
+“So, Laravel has evolved toward cleaner, faster development, with type safety, better scaffolding, simplified structure, and support for modern PHP. Each version improved developer experience and made Laravel more scalable and team-friendly.” <br>
+
+🔸 Laravel 8 (Sep 2020) <br>
+* Factory Classes (New Style): Instead of old closures, factories now use class-based structure (UserFactory). <br>
+* Model Directory Change: Models moved from app/Models by default instead of staying in app/. <br>
+* Laravel Jetstream: New authentication scaffolding (Livewire or Inertia.js). <br>
+* Job batching, dynamic Blade components, and route caching improvements. <br>
+📌 Common things : class-based factories and Jetstream to handle auth & team features. <br>
+
+ </br>
+
+
+
+🔸 Laravel 9 (Feb 2022) <br>
+* PHP 8 minimum, with Symfony v6 components. <br>
+* Anonymous Migrations: Prevent class name collisions in migration files. <br>
+* Query Builder Interface: Better auto-complete & IDE support. <br>
+* Flysystem v3: Improved file uploads. <br>
+* Moved to Symfony Mailer (from deprecated SwiftMailer). <br>
+📌 Common things : anonymous migrations in a team project to avoid merge conflicts and took advantage of type-safe queries in large DB systems. <br>
+
+ </br>
+
+
+
+🔸 Laravel 10 (Feb 2023) <br>
+* PHP 8.1 minimum required. <br>
+* All core code now fully typed: Method arguments and return types added across the framework. <br>
+* New Blade Component System (BladeX). <br>
+* Improved route caching, more expressive route definitions. <br>
+* Artisan test coverage, --coverage flag for php artisan test. <br>
+📌 Common things : better auto-completion & static analysis due to full typing, especially in large controller/service-based apps. <br>
+
+ </br>
+
+
+
+🔸 Laravel 11 (Feb 2024) <br>
+* Simplified default structure: No AppServiceProvider, RouteServiceProvider, ExceptionHandler by default – all handled behind the scenes, but customizable. <br>
+* Minimal Boilerplate: Less clutter for fresh installs – more readable and cleaner. <br>
+* SQLite by default for faster prototyping in local development. <br>
+* WorkOS Starter Kits: For SSO, OAuth, and passkeys with Jetstream/Breeze. <br>
+📌 Common things : Cleaner Middleware & Route definitions. <br>
+
+ </br>
+
+
+
+
+
+  **[⬆ Back to Top](#Important-Commands)**
+    
+
+
+
+       
+16. ###  Artisan Console 
+
+What is Artisan? <br>
+* Artisan is Laravel’s built-in Command Line Interface (CLI) tool that helps developers perform repetitive and common tasks more efficiently. <br>
+* Built on top of the Symfony Console component, so it's robust and extensible. <br>
+
+
+ </br>
+
+Viewing & Running Commands <br>
+* ```php artisan list```             # lists all commands <br>
+* ```php artisan help migrate```     # shows usage, arguments, options <br>
+* ```php artisan --version```        # current Laravel version <br>
+
+ </br>
+
+Creating Custom Commands <br>
+```php artisan make:command MyCommand``` # stub created in app/Console/Commands/MyCommand.php <br>
+ <br>
+ 
+* Define properties: <br>
+* protected $signature = 'name {arg} {--opt}' <br>
+* protected $description = '...'; <br>
+* public function handle() { /* logic */ } <br>
+
+ </br>
+
+Scheduling & Calling Commands <br>
+* Use schedule in Console/Kernel: ```$schedule->command('emails:send')->daily();``` <br>
+* Call other commands from inside: ```$this->call('command:name', ['arg'=>'foo','--opt'=>'bar']);``` <br>
+
+ </br>
+
+
+Testing Console Commands <br>
+```
+$this->artisan('inspire')
+     ->expectsQuestion('What is your name?', 'Taylor')
+     ->expectsOutput('...')
+     ->assertExitCode(0);
+```
+
+ </br>
+
+
+Arguments <br>
+* These are required or optional values passed without flags when running the command.<br>
+
+Syntax in Signature: <br>
+```protected $signature = 'greet {name}';```  <br>
+
+ </br>
+
+
+
+
+Options <br>
+* These are named flags, usually start with -- and are optional. <br>
+
+Syntax: <br>
+```protected $signature = 'send:email {--queue=}';``` <br>
+
+ </br>
+
+
+```
+
+[ Signature ]
+    Arguments:     {user}, {user?}, {user=Ayush}, {user*}
+    Options:       {--force}, {--queue=}, {--Q|queue=}, {--id=*}
+
+[ Input in handle() ]
+    $this->argument('user')         // gets argument
+    $this->option('queue')          // gets option
+
+[ Output Methods ]
+    $this->info(), $this->error()
+    $this->ask(), $this->confirm()
+
+[ Locking ]
+    use Isolatable
+    php artisan my:command --isolated
+
+
+```
+
+### ✅ Artisan Command Summary
+
+| Category             | Common Artisan Commands                               | Purpose                                      |
+|----------------------|--------------------------------------------------------|----------------------------------------------|
+| 🔧 Project Setup     | `php artisan serve`, `php artisan key:generate`        | Run dev server, generate app key             |
+| 🛠 Migrations        | `php artisan make:migration`, `php artisan migrate`    | Create and apply DB schema changes           |
+| 🧪 Testing           | `php artisan test`                                     | Run automated tests                          |
+| 📂 File Generation   | `php artisan make:model`, `make:controller`, `make:command` | Generate boilerplate code files         |
+| 📄 Routes/View Cache | `php artisan route:cache`, `view:clear`                | Cache and clear routes, views, config etc.   |
+| 🔄 Queue/Jobs        | `php artisan queue:work`, `queue:listen`               | Manage background jobs                       |
+| 🔐 Authentication    | `php artisan make:auth`, `ui`, `breeze:install`        | Scaffold auth system (via packages)          |
+| ⚙️ Custom Commands   | `php artisan make:command`                             | Create your own CLI commands                 |
+
+
+  **[⬆ Back to Top](#Important-Commands)**
+    
+
 
 
 
