@@ -7,6 +7,7 @@
 
 | No. | Questions |
 |---- | ---------
+|0 | [Basics](#Basics)|
 |1 | [How to Install Laravel](#Install-Laravel)|
 |2 | [Creating a New Project](#New-Project)|
 |3 | [Running Your Project in the Browser](#Run-your-Project-in-browser)|
@@ -45,6 +46,174 @@
 |36| [Service Providers](#Service-Providers)|
 |37| [Load one Million Records Efficiently](#Load-one-Million-Records-Efficiently)|
 |38| [Eager Loading n+1 problem](#Eager-Loading-n+1-problem)|
+
+
+
+
+
+
+<br>
+
+0. ### Basics
+
+🔁 Routing
+
+Defines application endpoints (URIs).
+```
+// routes/web.php
+Route::get('/hello', function () {
+    return 'Hello, Laravel!';
+});
+```
+
+🧱 Middleware
+
+Filter HTTP requests before they reach your routes/controllers.
+```
+// Assign middleware
+Route::get('/admin', function () {
+    return 'Admin Panel';
+})->middleware('auth');
+```
+
+🔒 CSRF Protection
+
+Secures POST, PUT, DELETE requests from cross-site attacks.
+```
+<form method="POST" action="/submit">
+    @csrf
+    <!-- input fields -->
+</form>
+```
+
+🧑‍💻 Controllers
+
+Handle request logic, keep routes clean.
+```
+php artisan make:controller UserController
+
+// in UserController.php
+public function show($id) {
+    return User::find($id);
+}
+
+// Route
+Route::get('/user/{id}', [UserController::class, 'show']);
+```
+
+📥 Requests
+
+Access user input data.
+```
+public function store(Request $request) {
+    $name = $request->input('name');
+    return "Hello $name";
+}
+```
+
+📤 Responses
+
+Return various responses to client.
+```
+return response('Hello', 200)
+            ->header('Content-Type', 'text/plain');
+```
+
+👁 Views
+
+HTML output from controller.
+```
+// Controller
+return view('welcome');
+
+// resources/views/welcome.blade.php
+<h1>Welcome to Laravel!</h1>
+```
+
+🖋 Blade Templates
+
+Laravel templating engine with clean syntax.
+```
+<!-- layout.blade.php -->
+<html>
+<body>
+    @yield('content')
+</body>
+</html>
+
+<!-- page.blade.php -->
+@extends('layout')
+@section('content')
+    <h1>Hello Blade!</h1>
+@endsection
+```
+
+🎒 Asset Bundling (Vite)
+
+Laravel uses Vite to bundle JS/CSS assets.
+```
+@vite(['resources/css/app.css', 'resources/js/app.js'])
+```
+
+🔗 URL Generation
+
+Create URLs to routes.
+```
+$url = route('home');
+$redirect = redirect()->route('dashboard');
+```
+
+📦 Session
+
+Store user data across requests.
+```
+// Store
+session(['key' => 'value']);
+
+// Retrieve
+$value = session('key');
+
+// Forget
+session()->forget('key');
+```
+
+✅ Validation
+
+Ensure user input is correct.
+```
+$request->validate([
+    'email' => 'required|email',
+    'password' => 'required|min:6'
+]);
+```
+
+❌ Error Handling
+
+Laravel uses App\Exceptions\Handler.
+```
+// Customize in app/Exceptions/Handler.php
+report($exception);
+render($request, $exception);
+```
+
+🪵 Logging
+
+Record application logs.
+```
+use Illuminate\Support\Facades\Log;
+
+Log::info('User logged in', ['id' => $user->id]);
+Log::error('Something went wrong');
+```
+
+<br>
+
+
+  **[⬆ Back to Top](#Important-Commands)**
+  
+
+---
+---
 
 
 
