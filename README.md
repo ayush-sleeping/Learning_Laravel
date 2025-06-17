@@ -59,27 +59,23 @@
 🔁 Routing
 
 Defines application endpoints (URIs).
-```
+```php
 // routes/web.php
-Route::get('/hello', function () {
-    return 'Hello, Laravel!';
-});
+Route::get('/hello', function () { return 'Hello, Laravel!'; });
 ```
 
 🧱 Middleware
 
 Filter HTTP requests before they reach your routes/controllers.
-```
+```php
 // Assign middleware
-Route::get('/admin', function () {
-    return 'Admin Panel';
-})->middleware('auth');
+Route::get('/admin', function () { return 'Admin Panel'; })->middleware('auth');
 ```
 
 🔒 CSRF Protection
 
 Secures POST, PUT, DELETE requests from cross-site attacks.
-```
+```php
 <form method="POST" action="/submit">
     @csrf
     <!-- input fields -->
@@ -89,7 +85,7 @@ Secures POST, PUT, DELETE requests from cross-site attacks.
 🧑‍💻 Controllers
 
 Handle request logic, keep routes clean.
-```
+```php
 php artisan make:controller UserController
 
 // in UserController.php
@@ -104,7 +100,7 @@ Route::get('/user/{id}', [UserController::class, 'show']);
 📥 Requests
 
 Access user input data.
-```
+```php
 public function store(Request $request) {
     $name = $request->input('name');
     return "Hello $name";
@@ -114,7 +110,7 @@ public function store(Request $request) {
 📤 Responses
 
 Return various responses to client.
-```
+```php
 return response('Hello', 200)
             ->header('Content-Type', 'text/plain');
 ```
@@ -122,7 +118,7 @@ return response('Hello', 200)
 👁 Views
 
 HTML output from controller.
-```
+```php
 // Controller
 return view('welcome');
 
@@ -133,7 +129,7 @@ return view('welcome');
 🖋 Blade Templates
 
 Laravel templating engine with clean syntax.
-```
+```php
 <!-- layout.blade.php -->
 <html>
 <body>
@@ -151,14 +147,14 @@ Laravel templating engine with clean syntax.
 🎒 Asset Bundling (Vite)
 
 Laravel uses Vite to bundle JS/CSS assets.
-```
+```php
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 ```
 
 🔗 URL Generation
 
 Create URLs to routes.
-```
+```php
 $url = route('home');
 $redirect = redirect()->route('dashboard');
 ```
@@ -166,7 +162,7 @@ $redirect = redirect()->route('dashboard');
 📦 Session
 
 Store user data across requests.
-```
+```php
 // Store
 session(['key' => 'value']);
 
@@ -180,7 +176,7 @@ session()->forget('key');
 ✅ Validation
 
 Ensure user input is correct.
-```
+```php
 $request->validate([
     'email' => 'required|email',
     'password' => 'required|min:6'
@@ -190,7 +186,7 @@ $request->validate([
 ❌ Error Handling
 
 Laravel uses App\Exceptions\Handler.
-```
+```php
 // Customize in app/Exceptions/Handler.php
 report($exception);
 render($request, $exception);
@@ -199,7 +195,7 @@ render($request, $exception);
 🪵 Logging
 
 Record application logs.
-```
+```php
 use Illuminate\Support\Facades\Log;
 
 Log::info('User logged in', ['id' => $user->id]);
@@ -566,7 +562,10 @@ Laravel starts from public/index.php, which:
 
  
 🧭 4. Laravel finds the matching route <br>
-* Checks ```routes/web.php``` or ```routes/api.php```
+* Checks
+  ```php
+  routes/web.php or routes/api.php
+  ```
 * Finds which controller or function should run
 
 
@@ -648,8 +647,14 @@ Final response is sent to the user
 🔹 1. Entry Point → public/index.php  <br>
 * Every web request first hits public/index.php.  <br>
 This file:  <br>
-* Loads Composer autoload ```vendor/autoload.php```  <br>
-* Loads Laravel’s core using ```bootstrap/app.php```  <br>
+* Loads Composer autoload
+  ```php
+  vendor/autoload.php
+  ```  <br>
+* Loads Laravel’s core using
+  ```php
+  bootstrap/app.php
+  ```  <br>
 * Creates the application instance  <br>
 
  </br>
@@ -694,7 +699,9 @@ Route can be:
   <br>
   
 ✅ Example: <br>
-```Route::get('/users', [UserController::class, 'index']);```
+```php 
+Route::get('/users', [UserController::class, 'index']);
+```
 
  </br>
 
@@ -854,7 +861,7 @@ Scheduling & Calling Commands <br>
 
 
 Testing Console Commands <br>
-```
+```php
 $this->artisan('inspire')
      ->expectsQuestion('What is your name?', 'Taylor')
      ->expectsOutput('...')
@@ -1077,12 +1084,12 @@ Return Response
 * 🛠️ Creating Custom Middleware
 
   
-```
+```php
 php artisan make:middleware CheckUserRole
 ```
 
 Example :
-```
+```php
 // app/Http/Middleware/CheckUserRole.php
 
 public function handle($request, Closure $next)
@@ -1096,13 +1103,13 @@ public function handle($request, Closure $next)
 ```
 
 Register it in app/Http/Kernel.php:
-```
+```php
 protected $routeMiddleware = [
     'check.role' => \App\Http\Middleware\CheckUserRole::class,
 ];
 ```
 Use in routes:
-```
+```php
 Route::get('/admin', function () {
     // Only accessible to admin users
 })->middleware('check.role');
@@ -1166,13 +1173,13 @@ if (Gate::denies('edit-post', $post)) {
 Policies are classes that organize authorization logic around a particular model or resource. Ideal for complex or resource-specific logic.
 
 * 🛠 Generate Policy
-```
+```php
 php artisan make:policy PostPolicy --model=Post
 ```
 This creates a PostPolicy class in app/Policies.
 
 * ✏️ Define Methods
-```
+```php
 public function update(User $user, Post $post)
 {
     return $user->id === $post->user_id;
@@ -1181,14 +1188,14 @@ public function update(User $user, Post $post)
 
 * 🔗 Register the Policy
 Register it in AuthServiceProvider.php:
-```
+```php
 protected $policies = [
     \App\Models\Post::class => \App\Policies\PostPolicy::class,
 ];
 ```
 
 * ✅ Use a Policy
-```
+```php
 $this->authorize('update', $post);
 
 // OR
@@ -1269,7 +1276,7 @@ Query Builder is Laravel’s more manual and flexible way to write database quer
 
 
 🧾 Example:
-```
+```php
 // Get all users
 $users = DB::table('users')->get();
 
@@ -1449,7 +1456,7 @@ php artisan make:factory UserFactory --model=User
 
 <br>
 
-```
+```php
 // database/factories/UserFactory.php
 public function definition()
 {
@@ -1463,7 +1470,7 @@ public function definition()
 
 ▶️ Usage:
 
-```
+```php
 // Create one user
 User::factory()->create();
 
@@ -1491,7 +1498,7 @@ php artisan make:seeder UserSeeder
 
 <br>
 
-```
+```php
 // database/seeders/UserSeeder.php
 public function run()
 {
@@ -1510,18 +1517,18 @@ public function run()
 🚀 Running Seeders
 
 You can run a seeder individually:
-```
+```bash
 php artisan db:seed --class=UserSeeder
 ```
 
 
 Or run all registered seeders from DatabaseSeeder.php:
-```
+```bash
 php artisan db:seed
 ```
 
 Also, combine with migration:
-```
+```bash
 php artisan migrate:fresh --seed
 ```
 
@@ -1544,7 +1551,7 @@ php artisan migrate:fresh --seed
 - Use both together: Factory defines, Seeder executes. <br>
 💡 Pro Tip: Always register custom seeders inside DatabaseSeeder.php if you want to run all seeders together.
 
-```
+```php
 // database/seeders/DatabaseSeeder.php
 public function run()
 {
@@ -1660,7 +1667,7 @@ Then run:
 
 
 2. Use SoftDeletes trait in your model:
-```
+```php
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -1749,7 +1756,7 @@ php artisan make:event UserRegistered
 ```
 
 
-```
+```php
 // Example: App\Events\UserRegistered
 public function __construct(public User $user) {}
 ```
@@ -1763,11 +1770,11 @@ Examples:
 - Log activity
 - Notify admin
 
-```
+```bash
 php artisan make:listener SendWelcomeEmail --event=UserRegistered
 ```
 
-```
+```php
 // Example: App\Listeners\SendWelcomeEmail
 public function handle(UserRegistered $event)
 {
@@ -1778,7 +1785,7 @@ public function handle(UserRegistered $event)
 🧬 Flow of Event-Listener
 
 1. Some part of your code fires an event:
-```
+```php
 event(new UserRegistered($user));
 ```
 2. Laravel finds all listeners attached to this event.
@@ -1787,7 +1794,7 @@ event(new UserRegistered($user));
 ⚙️ Registering Events & Listeners
 
 You define them in:
-```
+```php
 // app/Providers/EventServiceProvider.php
 
 protected $listen = [
@@ -1810,7 +1817,7 @@ protected $listen = [
 
 Make a listener implement ShouldQueue:
 
-```
+```php
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendWelcomeEmail implements ShouldQueue
@@ -1875,7 +1882,7 @@ php artisan make:observer UserObserver --model=User
 ```
 
 This creates a file like:
-```
+```php
 // app/Observers/UserObserver.php
 
 namespace App\Observers;
@@ -1904,7 +1911,7 @@ class UserObserver
 🔗 Registering the Observer
 
 You register observers in the AppServiceProvider or any other service provider:
-```
+```php
 // app/Providers/AppServiceProvider.php
 
 use App\Models\User;
@@ -1986,7 +1993,7 @@ app/Http/Resources/UserResource.php
 ```
 
 🧱 Basic Example
-```
+```php
 // app/Http/Resources/UserResource.php
 
 namespace App\Http\Resources;
@@ -2009,7 +2016,7 @@ class UserResource extends JsonResource
 
 📤 Returning API Resources from Controller
 
-```
+```php
 use App\Http\Resources\UserResource;
 use App\Models\User;
 
@@ -2021,7 +2028,7 @@ return UserResource::collection(User::all());
 ```
 
 🔄 Transforming Relationships
-```
+```php
 public function toArray($request)
 {
     return [
@@ -2034,7 +2041,7 @@ Use whenLoaded() to conditionally load relationships (avoid N+1 problem).
 
 ✨ Conditional Attributes
 
-```
+```php
 return [
     'email' => $this->when(auth()->user()->isAdmin(), $this->email),
 ];
@@ -2049,7 +2056,7 @@ return [
 
 By default, UserResource::collection($users) returns a ResourceCollection that wraps data in:
 
-```
+```php
 {
     "data": [ ... ]
 }
@@ -2057,7 +2064,7 @@ By default, UserResource::collection($users) returns a ResourceCollection that w
 
 You can customize it by creating:
 
-```
+```bash
 php artisan make:resource UserCollection
 ```
 
@@ -2167,7 +2174,7 @@ With guards, you can:
 
 🧪 Using Guards in Code
 
-```
+```php
 // Check which guard is currently authenticated
 Auth::guard('admin')->check();
 
@@ -2180,7 +2187,7 @@ $admin = Auth::guard('admin')->user();
 
 🔐 Using Guards in Middleware (Routes)
 
-```
+```php
 Route::middleware('auth:admin')->group(function () {
     // Admin-only routes
 });
@@ -2239,7 +2246,7 @@ Security breaches in encrypted content
 
 Use Artisan command:
 
-```
+```bash
 php artisan key:generate
 ```
 
@@ -2438,7 +2445,7 @@ Not commonly used in APIs, mostly for browser-based requests.
 
 🧠 Laravel Example:
 
-```
+```php
 return response()->json(['error' => 'Unauthorized'], 401);
 
 return response()->json(['errors' => $validator->errors()], 422);
@@ -2456,12 +2463,12 @@ return response()->json(['errors' => $validator->errors()], 422);
 🛠 Laravel Tips
 
 🔁 Returning Status Codes in JSON:
-```
+```php
 return response()->json(['message' => 'Success'], 200);
 ```
 
 🧪 Validating and Returning 422:
-```
+```php
 $request->validate([
     'email' => 'required|email',
 ]);
@@ -2547,14 +2554,14 @@ SESSION_DRIVER=file
 ⚙️ How to Access .env Variables in Laravel
 
 1. Using the env() helper (not recommended in production code except in config files):
-```
+```php
 $env = env('APP_ENV'); // returns 'local'
 ```
 
 2. Using Laravel Config:
 Laravel reads .env variables and stores them in config files like config/app.php, config/database.php, etc.
 You should access them using config() for better performance:
-```
+```php
 config('app.env');       // returns 'local'
 config('database.connections.mysql.database');
 ```
@@ -2566,7 +2573,7 @@ config('database.connections.mysql.database');
 - Use php artisan config:cache in production to cache configuration and improve performance.
 
 🛠 Commands Related to .env
-```
+```bash
 php artisan config:cache   # Caches .env and config values
 php artisan config:clear   # Clears cached config
 ```
@@ -2646,7 +2653,7 @@ Laravel automatically injects the PaymentGateway instance from the container.
 🔨 Manual Binding Example
 
 You can bind a class or interface in the container manually using the bind or singleton method:
-```
+```php
 use App\Services\PaymentGateway;
 use App\Services\StripePaymentGateway;
 
@@ -2665,7 +2672,7 @@ This tells Laravel to give StripePaymentGateway whenever PaymentGateway is reque
 
 
 🧩 Accessing the Container
-```
+```php
 // Resolve a class manually
 $payment = app()->make(PaymentGateway::class);
 ```
@@ -2674,7 +2681,7 @@ $payment = app()->make(PaymentGateway::class);
 
 Use the register() method inside App\Providers\AppServiceProvider.php:
 
-```
+```php
 public function register()
 {
     $this->app->singleton(PaymentGateway::class, StripePaymentGateway::class);
@@ -2738,7 +2745,7 @@ class OrderService {
 
 ✅ Example With Dependency Injection
 
-```
+```php
 class OrderService {
     protected $payment;
 
@@ -2754,7 +2761,7 @@ class OrderService {
 
 Laravel uses the Service Container to automatically resolve and inject the dependencies when a class is instantiated:
 
-```
+```php
 $service = app()->make(OrderService::class);
 ```
 
@@ -2769,7 +2776,7 @@ $service = app()->make(OrderService::class);
 
 🚀 Real Laravel Controller Example
 
-```
+```php
 use App\Services\NotificationService;
 
 class UserController extends Controller {
@@ -2830,7 +2837,7 @@ app/Providers/
 ```
 
 And registered in the config file:
-```
+```php
 config/app.php → 'providers' array
 ```
 
@@ -2853,14 +2860,14 @@ config/app.php → 'providers' array
 
 
 ✍️ Creating a Custom Service Provider
-```
+```php
 php artisan make:provider CustomServiceProvider
 ```
 
 This creates a file in app/Providers.
 
 Example
-```
+```php
 public function register()
 {
     $this->app->bind('SomeService', function () {
@@ -2932,7 +2939,7 @@ User::chunk(1000, function ($users) {
 ✅ 2. Use cursor() for Streaming Results
 
 If you only need to loop through data (read-only), use cursor():
-```
+```php
 foreach (User::cursor() as $user) {
     // process user
 }
@@ -2945,7 +2952,7 @@ foreach (User::cursor() as $user) {
 ✅ 3. Optimize Queries with select()
 
 Only retrieve the columns you need:
-```
+```php
 User::select('id', 'email')->chunk(1000, function ($users) {
     // process
 });
@@ -2963,14 +2970,14 @@ Ensure indexes are present on:
 - ORDER BY columns
 
 📌 Example:
-```
+```php
 CREATE INDEX idx_email ON users(email);
 ```
 
 ✅ 5. Use Pagination or LazyCollection for APIs
 
 For user-facing interfaces:
-```
+```php
 User::paginate(100); // classic pagination
 
 // Or use LazyCollection
@@ -2982,7 +2989,7 @@ User::lazy()->each(function ($user) {
 ✅ 6. Disable Events / Observers (If Not Needed)
 
 If you're importing/exporting or just analyzing:
-```
+```php
 User::withoutEvents(function () {
     User::chunk(1000, function ($users) {
         // ...
@@ -2995,7 +3002,7 @@ User::withoutEvents(function () {
 For CPU-heavy tasks (e.g. emailing users):
 
 Dispatch each chunk to a job queue
-```
+```php
 User::chunk(1000, function ($users) {
     dispatch(new ProcessUsersJob($users));
 });
@@ -3054,7 +3061,7 @@ foreach ($posts as $post) {
 Eager loading is a technique to load related models in advance, reducing the number of queries.
 
 ✅ Example (Eager Loading):
-```
+```php
 $posts = Post::with('user')->get();
 
 foreach ($posts as $post) {
@@ -3068,17 +3075,17 @@ Only 2 queries:
 🛠 Syntax of Eager Loading
 
 ➤ Basic Eager Loading:
-```
+```php
 $books = Book::with('author')->get();
 ```
 
 ➤ Nested Eager Loading:
-```
+```php
 $posts = Post::with('comments.user')->get();
 ```
 
 ➤ Eager Loading Specific Columns:
-```
+```php
 $posts = Post::with(['user:id,name'])->get();
 ```
 
@@ -3097,7 +3104,7 @@ $posts = Post::with(['user:id,name'])->get();
 | **Lazy Eager**    | Load later using `load()` after retrieving parent models |
 
 ➤ Lazy Eager Example:
-```
+```php
 $posts = Post::all();
 $posts->load('user');
 ```
