@@ -6,9 +6,9 @@
 <br>
 
 
-## 📘 What Exactly is Laravel? — Interview Prep
+### 📘 What Exactly is Laravel?
 
-### ✅ Laravel Definition
+## ✅ Laravel Definition
 
 **Laravel** is a free, open-source PHP framework used to build modern web applications. It follows the **MVC (Model-View-Controller)** architecture and provides built-in tools like:
 
@@ -21,6 +21,7 @@
 
 It simplifies repetitive tasks like routing, sessions, and caching, allowing developers to write **clean, secure, and scalable code faster**.
 
+
 ### 🔹 1. Architecture
 
 Laravel follows **MVC**, which separates the application into three core layers:
@@ -30,19 +31,32 @@ Laravel follows **MVC**, which separates the application into three core layers:
 * **Controller**: Handles HTTP requests and connects models & views
 
 
-### 🔹 2. Built-in Features
+### 🔹 2. Built-in Features with Code Examples
 
-| **Feature**  | **Purpose**                                      |
-| ------------ | ------------------------------------------------ |
-| Routing      | Define application URLs and logic                |
-| Eloquent ORM | Database interaction using PHP objects           |
-| Blade        | Templating engine for dynamic HTML               |
-| Artisan      | CLI tool for running Laravel commands            |
-| Migrations   | Version-controlled database schema               |
-| Middleware   | Filters for HTTP requests (authentication, etc.) |
-| Validation   | Validate incoming request data easily            |
+| **Feature**  | **Purpose**                                      | **Example Code**                                                          |             |
+| ------------ | ------------------------------------------------ | ------------------------------------------------------------------------- | ----------- |
+| Routing      | Define application URLs and logic                | `Route::get('/home', [HomeController::class, 'index']);`                  |             |
+| Eloquent ORM | Database interaction using PHP objects           | `$users = User::where('active', 1)->get();`                               |             |
+| Blade        | Templating engine for dynamic HTML               | `Hello, {{ $name }}`                                                      |             |
+| Artisan      | CLI tool for running Laravel commands            | `php artisan make:model Post -mcr`                                        |             |
+| Migrations   | Version-controlled database schema               | `Schema::create('posts', function (Blueprint $table) { $table->id(); });` |             |
+| Middleware   | Filters for HTTP requests (authentication, etc.) | `$this->middleware('auth');`                                              |             |
+| Validation   | Validate incoming request data easily            | \`\$request->validate(\['email' => 'required                              | email']);\` |
+
+
+### 🔹 3. Additional Key Concepts with Short Examples
+
+| **Concept**             | **Short Code Example**                                            |
+| ----------------------- | ----------------------------------------------------------------- |
+| **Routing**             | `Route::get('/about', function () { return view('about'); });`    |
+| **Authentication**      | `Auth::attempt(['email' => $email, 'password' => $password]);`    |
+| **Database Migration**  | `php artisan make:migration create_posts_table`                   |
+| **Eloquent ORM**        | `$post = Post::find(1);`                                          |
+| **Blade Templating**    | `@foreach($posts as $post) <p>{{ $post->title }}</p> @endforeach` |
+| **RESTful API Support** | `Route::apiResource('posts', PostController::class);`             |
 
 ---
+
 
 
 <br>
