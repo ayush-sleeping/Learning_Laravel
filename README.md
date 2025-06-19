@@ -112,7 +112,7 @@ Laravel follows **MVC**, which separates the application into three core layers:
 
 <br>
 
-0. ### Basics :
+0. ### Basics
 
 * Routing
 * Middleware
@@ -241,7 +241,8 @@ Route::get('/user/{id}', [UserController::class, 'show']);
 ```
 
 📥 Requests
-To obtain an instance of the current HTTP request via dependency injection, you should type-hint the Illuminate\Http\Request class on your route closure or controller method. The incoming request instance will automatically be injected by the Laravel service container:
+
+- To obtain an instance of the current HTTP request via dependency injection, you should type-hint the Illuminate\Http\Request class on your route closure or controller method. The incoming request instance will automatically be injected by the Laravel service container:
 
 Access user input data.
 ```php
@@ -260,7 +261,9 @@ return response('Hello', 200)
 ```
 
 👁 Views
-Views separate your controller / application logic from your presentation logic and are stored in the resources/views directory. When using Laravel, view templates are usually written using the Blade templating language. 
+
+- Views separate your controller / application logic from your presentation logic and are stored in the resources/views directory. When using Laravel, view templates are usually written using the Blade templating language.
+  
 HTML output from controller.
 ```php
 // Controller
