@@ -876,7 +876,7 @@ npm run dev
 
 
 
-## 📁 Laravel Folder Structure Breakdown (Important for Interviews)
+## 📁 Laravel Folder Structure Breakdown 
 
 ### 🔸 Migrations
 
@@ -961,14 +961,33 @@ This creates:
 ### 🔹 Update Migration File
 
 ```php
-Schema::create('articles', function (Blueprint $table) {
-    $table->id();
-    $table->string('title');
-    $table->string('slug')->unique();
-    $table->text('content');
-    $table->string('image')->nullable();
-    $table->timestamps();
-});
+<?php
+use Illuminate\Database\Migrations\Migration; // Responsible for creating the articles table in the database
+use Illuminate\Database\Schema\Blueprint; // Provides methods to define the structure of the articles table
+use Illuminate\Support\Facades\Schema; // Provides methods to interact with the database schema
+
+return new class extends Migration // Migration class to create the articles table
+{
+    /* Run the migrations : means creating the articles table */
+    public function up(): void
+    {
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->string('slug')->unique()->nullable();
+            $table->text('content');
+            $table->string('image')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /* Reverse the migrations : means dropping the articles table */
+    public function down(): void
+    {
+        Schema::dropIfExists('articles'); // drop the articles table if it exists
+    }
+
+};
 ```
 
 ### 🔹 Run Migrations
@@ -980,8 +999,19 @@ php artisan migrate
 ### 🔹 Setup Fillable Fields in Model
 
 ```php
-class Article extends Model {
-    protected $fillable = ['title', 'slug', 'content', 'image'];
+<?php
+namespace App\Models; // defines the Article model, which represents the articles in the application.
+use Illuminate\Database\Eloquent\Model; // Eloquent Model class : provides the base functionality for interacting with the database.
+
+class Article extends Model // Article model class : that extends the base Model class from Laravel's Eloquent ORM.
+{
+    // defining the fillable fields for mass assignment
+    protected $fillable = [
+        'title',
+        'slug',
+        'content',
+        'image',
+    ];
 }
 ```
 
@@ -1071,6 +1101,27 @@ public function destroy(Article $article) {
 </form>
 ```
 
+## Routes 
+```php
+// web.php
+<?php
+use App\Http\Controllers\ArticleController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () { return view('welcome'); });
+
+// Route::get('/articles', [ArticleController::class, 'index'])->name('articles.index');
+// Route::get('/articles/create', [ArticleController::class, 'create'])->name('articles.create');
+// Route::post('/articles', [ArticleController::class, 'store'])->name('articles.store');
+// Route::get('/articles/{article}', [ArticleController::class, 'show'])->name('articles.show');
+// Route::get('/articles/{article}/edit', [ArticleController::class, 'edit'])->name('articles.edit');
+// Route::put('/articles/{article}', [ArticleController::class, 'update'])->name('articles.update');
+// Route::delete('/articles/{article}', [ArticleController::class, 'destroy'])->name('articles.destroy');
+
+
+Route::resource('articles', ArticleController::class);
+
+```
 
 
 ## ✅ Final Checklist Before Testing
