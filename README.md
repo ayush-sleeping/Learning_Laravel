@@ -63,7 +63,7 @@ Laravel follows **MVC**, which separates the application into three core layers:
 
 ### Important Commands
 
-| No. | Questions |
+| No. | Topics |
 |---- | ---------
 |0 | [Basics](#Basics)|
 |1 | [How to Install Laravel](#Install-Laravel)|
@@ -114,22 +114,27 @@ Laravel follows **MVC**, which separates the application into three core layers:
 
 0. ### Basics
 
-* Routing
-* Middleware
-* CSRF Protection
-* Controllers
-* Requests
-* Responses
-* Views
-* Blade Templates
-* Asset Bundling
-* URL Generation
-* Session
-* Validation
-* Error Handling
-* Logging
 
-🔁 Routing
+| Topics |
+|--------|
+| [Routing](#Routing) |
+| [Middleware](#Middleware) |
+| [CSRF Protection](#CSRF-Protection) |
+| [Controllers](#Controllers) |
+| [Requests](#Requests) |
+| [Responses](#Responses) |
+| [Views](#Views) |
+| [Blade Templates](#Blade-Templates) |
+| [Asset Bundling](#Asset-Bundling) |
+| [URL Generation](#URL-Generation) |
+| [Session](#Session) |
+| [Validation](#Validation) |
+| [Error Handling](#Error-Handling) |
+| [Logging](#Logging) |
+
+
+
+### Routing
 
 Defines application endpoints (URIs).
 In example :-
