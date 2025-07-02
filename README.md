@@ -213,6 +213,12 @@ public function handle($request, Closure $next, ...$guards)
 }
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### CSRF Protection
@@ -236,6 +242,12 @@ Without CSRF protection, a malicious website could create an HTML form that poin
 </script>
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Controllers
@@ -270,6 +282,12 @@ use App\Http\Controllers\UserController;
 Route::get('/user/{id}', [UserController::class, 'show']);
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Requests
@@ -284,6 +302,12 @@ public function store(Request $request) {
 }
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Responses
@@ -294,6 +318,12 @@ return response('Hello', 200)
             ->header('Content-Type', 'text/plain');
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Views
@@ -308,6 +338,12 @@ return view('welcome');
 // resources/views/welcome.blade.php
 <h1>Welcome to Laravel!</h1>
 ```
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 
 ##
 
@@ -337,6 +373,12 @@ Laravel templating engine with clean syntax.
 @endsection
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Asset Bundling
@@ -353,6 +395,12 @@ Laravel uses Vite to bundle JS/CSS assets.
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### URL Generation
@@ -375,6 +423,12 @@ Blade Usage Example
 <a href="{{ route('posts.show', $post->id) }}">View Post</a>
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Session
@@ -446,6 +500,12 @@ class ProductController extends Controller
 }
 ```
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 
@@ -490,6 +550,12 @@ Extra Capabilities
 -  For API: Laravel returns **structured JSON error responses**
 
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 
@@ -522,6 +588,12 @@ public function render($request, Throwable $exception)
 }
 ```
 
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
+
 ##
 
 
@@ -548,6 +620,12 @@ Log::error('Something went wrong');
 -  Critical logs can be routed to Slack or third-party alerting tools.
 -  Logging helps in debugging, monitoring, and maintaining app stability.
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Laravel Artisan and Composer Command Cheatsheet
@@ -577,6 +655,12 @@ Log::error('Something went wrong');
 
 
 
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
+
 ##
 
 
@@ -593,6 +677,12 @@ Log::error('Something went wrong');
 
 
 
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
+
 ##
 
 
@@ -604,6 +694,12 @@ Log::error('Something went wrong');
 | Update without platform reqs | `composer update --ignore-platform-reqs` |
 
 
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 
 ##
 
