@@ -118,7 +118,7 @@ Laravel follows **MVC**, which separates the application into three core layers:
 
 <br>
 
-0. ### Basics
+### Basics
 
 
 | Topics |
@@ -171,6 +171,11 @@ Route::get('/', function () { return view('welcome'); });
 Route::resource('articles', ArticleController::class);
 ```
 
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
 ##
 
 ### Middleware
