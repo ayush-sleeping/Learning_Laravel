@@ -131,6 +131,10 @@ Laravel follows **MVC**, which separates the application into three core layers:
 | [Validation](#Validation) |
 | [Error Handling](#Error-Handling) |
 | [Logging](#Logging) |
+| [Laravel Artisan and Composer Command Cheatsheet](#Laravel-Artisan-and-Composer-Command-Cheatsheet) |
+| [Refresh Laravel Cache](#Refresh-Laravel-Cache) |
+| [Composer Commands](#Composer-Commands) |
+| [Git Commands](#Git-Commands) |
 
 
 
@@ -157,7 +161,7 @@ Route::get('/', function () { return view('welcome'); });
 Route::resource('articles', ArticleController::class);
 ```
 
-🧱 Middleware
+### Middleware
 
 To create a new middleware, use the make:middleware Artisan command:
 ```php
@@ -192,7 +196,7 @@ public function handle($request, Closure $next, ...$guards)
 }
 ```
 
-🔒 CSRF Protection
+### CSRF Protection
 
 CSRF :  cross site request forgery <br>
 Secures POST, PUT, DELETE requests from cross-site attacks.
@@ -213,7 +217,7 @@ Without CSRF protection, a malicious website could create an HTML form that poin
 </script>
 ```
 
-🧑‍💻 Controllers
+### Controllers
 
 ```
 php artisan make:controller UserController
@@ -245,7 +249,7 @@ use App\Http\Controllers\UserController;
 Route::get('/user/{id}', [UserController::class, 'show']);
 ```
 
-📥 Requests
+### Requests
 
 - To obtain an instance of the current HTTP request via dependency injection, you should type-hint the Illuminate\Http\Request class on your route closure or controller method. The incoming request instance will automatically be injected by the Laravel service container:
 
@@ -257,7 +261,7 @@ public function store(Request $request) {
 }
 ```
 
-📤 Responses
+### Responses
 
 Return various responses to client.
 ```php
@@ -265,7 +269,7 @@ return response('Hello', 200)
             ->header('Content-Type', 'text/plain');
 ```
 
-👁 Views
+### Views
 
 - Views separate your controller / application logic from your presentation logic and are stored in the resources/views directory. When using Laravel, view templates are usually written using the Blade templating language.
   
@@ -304,7 +308,7 @@ Laravel templating engine with clean syntax.
 @endsection
 ```
 
-🎒 Asset Bundling (Vite)
+### Asset Bundling
 
 - Vite is a modern frontend build tool for bundling assets.
 - It provides an extremely fast development environment.
@@ -318,7 +322,7 @@ Laravel uses Vite to bundle JS/CSS assets.
 @vite(['resources/css/app.css', 'resources/js/app.js'])
 ```
 
-🔗 URL Generation
+### URL Generation
 
 - URL generation refers to dynamically creating URLs to routes, assets, or controller actions in Laravel.
 - Laravel provides helper functions to easily generate URLs throughout your application — in Blade templates, controllers, and API responses.
@@ -338,7 +342,7 @@ Blade Usage Example
 <a href="{{ route('posts.show', $post->id) }}">View Post</a>
 ```
 
-📦 Session
+### Session
 
 - HTTP is stateless, which means each request is independent and has no memory of previous requests.
 - Sessions allow you to store user data across multiple requests, helping track login state, messages, user preferences, etc.
@@ -408,7 +412,7 @@ class ProductController extends Controller
 ```
 
 
-✅ Validation
+### Validation
 
 Ensure user input is correct.
 ```php
@@ -450,7 +454,7 @@ Extra Capabilities
 
 
 
-❌ Error Handling
+### Error Handling
 
 Laravel uses App\Exceptions\Handler.
 ```php
@@ -480,7 +484,7 @@ public function render($request, Throwable $exception)
 ```
 
 
-🪵 Logging
+### Logging
 
 Record application logs.
 ```php
@@ -506,7 +510,7 @@ Log::error('Something went wrong');
 
 <br>
 
-* 🛠️ Laravel Artisan & Composer Command Cheatsheet
+### Laravel Artisan and Composer Command Cheatsheet
 
 | **Purpose**                                  | **Command**                                                                |
 | -------------------------------------------- | -------------------------------------------------------------------------- |
@@ -531,7 +535,12 @@ Log::error('Something went wrong');
 | List all routes                              | `php artisan route:list`                                                   |
 | Publish mail config files                    | `php artisan vendor:publish --tag=laravel-mail`                            |
 
-* 🔁 Refresh Laravel Cache
+
+
+<br>
+
+
+### Refresh Laravel Cache
 
 | **Purpose**                   | **Command**                  |
 | ----------------------------- | ---------------------------- |
@@ -542,14 +551,24 @@ Log::error('Something went wrong');
 | Clear view cache              | `php artisan view:clear`     |
 | Clear config cache            | `php artisan config:clear`   |
 
-* 📦 Composer Commands
+
+
+<br>
+
+
+### Composer Commands
 
 | **Purpose**                  | **Command**                              |
 | ---------------------------- | ---------------------------------------- |
 | Update dependencies          | `composer update`                        |
 | Update without platform reqs | `composer update --ignore-platform-reqs` |
 
-* 🧰 Git Commands
+
+
+<br>
+
+
+### Git Commands
 
 | **Purpose**         | **Command**               |
 | ------------------- | ------------------------- |
@@ -560,6 +579,9 @@ Log::error('Something went wrong');
 | Push to repo        | `git push`                |
 
 
+
+
+<br>
 
 <br>
 
