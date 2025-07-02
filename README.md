@@ -631,27 +631,69 @@ Log::error('Something went wrong');
 ### Laravel Artisan and Composer Command Cheatsheet
 
 | **Purpose**                                  | **Command**                                                                |
-| -------------------------------------------- | -------------------------------------------------------------------------- |
+|---------------------------------------------|-----------------------------------------------------------------------------|
 | Install Laravel globally                     | `composer global require laravel/installer`                                |
 | Create new Laravel project                   | `laravel new app_name`                                                     |
 | Move into project directory                  | `cd app_name`                                                              |
 | Run Laravel dev server                       | `php artisan serve`                                                        |
-| Run with port                                | `php artisan serve --port=8080`                                            |
+| Run with custom port                         | `php artisan serve --port=8080`                                            |
 | Run with custom host                         | `php artisan serve --host="192.168.29.213"`                                |
+
+### 🛠️ Code Generation
+| **Purpose**                                  | **Command**                                                                |
+|---------------------------------------------|-----------------------------------------------------------------------------|
 | Make model with migration                    | `php artisan make:model ModelName -m`                                      |
 | Create a controller (resourceful)            | `php artisan make:controller ExampleController --resource`                 |
+| Create a simple controller                   | `php artisan make:controller ExampleController`                            |
 | Create a migration                           | `php artisan make:migration create_table_name -m`                          |
-| Add columns to existing table                | `php artisan make:migration add_columnname_to_tablename --table=tablename` |
+| Add columns to existing table                | `php artisan make:migration add_columnname_to_tablename --table=tablename`|
 | Remove columns from table                    | `php artisan make:migration remove_columns_from_table --table=table_name`  |
+| Create a middleware                          | `php artisan make:middleware CheckSomething`                               |
+| Create a form request                        | `php artisan make:request StoreSomethingRequest`                           |
+| Create a seeder                              | `php artisan make:seeder UsersTableSeeder`                                 |
+| Create a factory                             | `php artisan make:factory UserFactory --model=User`                        |
+| Create an event                              | `php artisan make:event SomethingHappened`                                 |
+| Create a listener                            | `php artisan make:listener HandleSomething`                                |
+| Create a job                                 | `php artisan make:job ProcessSomething`                                    |
+| Create a resource                            | `php artisan make:resource UserResource`                                   |
+
+### 🗃️ Database & Migrations
+| **Purpose**                                  | **Command**                                                                |
+|---------------------------------------------|-----------------------------------------------------------------------------|
 | Run all migrations                           | `php artisan migrate`                                                      |
+| Rollback last batch of migrated files        | `php artisan migrate:rollback`                                             |
+| Rollback one step                            | `php artisan migrate:rollback --step=1`                                    |
+| Reset all migrations                         | `php artisan migrate:reset`                                                |
 | Fresh migrate (drop and recreate all tables) | `php artisan migrate:fresh`                                                |
-| Run seeders                                  | `php artisan db:seed`                                                      |
 | Migrate and seed together                    | `php artisan migrate --seed`                                               |
 | Fresh migrate with seed                      | `php artisan migrate:fresh --seed`                                         |
+| Run seeders                                  | `php artisan db:seed`                                                      |
+
+### 🔑 Application & Setup
+| **Purpose**                                  | **Command**                                                                |
+|---------------------------------------------|-----------------------------------------------------------------------------|
 | Generate app key                             | `php artisan key:generate`                                                 |
 | Create storage symlink                       | `php artisan storage:link`                                                 |
+
+### 🔄 Cache & Config
+| **Purpose**                                  | **Command**                                                                |
+|---------------------------------------------|-----------------------------------------------------------------------------|
+| Clear route cache                            | `php artisan route:clear`                                                  |
+| Clear config cache                           | `php artisan config:clear`                                                 |
+| Clear app cache                              | `php artisan cache:clear`                                                  |
+| Clear compiled views                         | `php artisan view:clear`                                                   |
+| Rebuild config cache                         | `php artisan config:cache`                                                 |
+| Clear all compiled files                     | `php artisan clear-compiled`                                               |
+
+### 📋 Other Helpful Commands
+| **Purpose**                                  | **Command**                                                                |
+|---------------------------------------------|-----------------------------------------------------------------------------|
 | List all routes                              | `php artisan route:list`                                                   |
-| Publish mail config files                    | `php artisan vendor:publish --tag=laravel-mail`                            |
+| List all available Artisan commands          | `php artisan list`                                                         |
+| Show help for a command                      | `php artisan help migrate`                                                 |
+| Publish vendor files (e.g. mail config)      | `php artisan vendor:publish --tag=laravel-mail`                            |
+| Queue worker (start processing jobs)         | `php artisan queue:work`                                                   |
+
 
 
 
