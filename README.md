@@ -688,6 +688,126 @@ Log::error('Something went wrong');
   
 ##
 
+
+## 🔗 Eloquent Relationships
+
+- Eloquent relationships allow different database tables to be **connected logically** using Laravel models.
+- It provides an elegant, readable way to work with relational data.
+
+In example :
+Define Relationships in Models
+```
+Post.php
+
+class Post extends Model {
+    use HasFactory;
+
+    public function comments() {
+        return $this->hasMany(Comment::class);
+    }
+}
+```
+```
+Comment.php
+
+class Comment extends Model {
+    use HasFactory;
+
+    public function post() {
+        return $this->belongsTo(Post::class);
+    }
+}
+```
+
+### 🔸 One to One
+
+- Each record in a table has exactly **one** related record in another.
+- Example: One `User` has **one** `Profile`.
+
+```php
+public function profile() {
+    return $this->hasOne(Profile::class);
+}
+```
+
+### 🔸 One to Many
+
+One record is related to many others.
+Example: One Post has many Comments.
+
+```php
+public function comments() {
+    return $this->hasMany(Comment::class);
+}
+```
+
+### 🔸 Many to Many
+
+Records on both sides have multiple relationships with each other.
+Example: A User can have many Roles, and each Role can belong to many Users.
+
+```php
+public function roles() {
+    return $this->belongsToMany(Role::class);
+}
+```
+
+### 🔸 Has One Through
+
+Used when one model is related through another.
+Example: A Country has one PostOfficeManager through PostOffice.
+
+```php
+public function manager() {
+    return $this->hasOneThrough(Manager::class, Office::class);
+}
+```
+
+### 🔸 Has Many Through
+
+Like above, but for multiple records.
+Example: A Country has many Posts through PostOffices.
+
+```php
+public function posts() {
+    return $this->hasManyThrough(Post::class, Office::class);
+}
+```
+
+### 🔸 Polymorphic Relationships
+
+Allow a model to belong to more than one other model on a single association.
+Example: Comment can belong to both Post and Video.
+
+```php
+public function commentable() {
+    return $this->morphTo();
+}
+```
+
+---
+
+* 🛠️ Relationship Helpers
+
+| Method              | Use Case                                   |
+|---------------------|---------------------------------------------|
+| `$model->relation`  | Access related model                        |
+| `with()`            | Eager loading                               |
+| `has()`             | Filter models with related data             |
+| `whereHas()`        | Add where clause to related data            |
+| `doesntHave()`      | Opposite of `has()`                         |
+| `sync()`            | Sync pivot table                            |
+| `attach()`          | Attach pivot record                         |
+| `detach()`          | Detach pivot record                         |
+
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
+##
+
+
 ### Laravel Artisan and Composer Command Cheatsheet
 
 | **Purpose**                                  | **Command**                                                                |
