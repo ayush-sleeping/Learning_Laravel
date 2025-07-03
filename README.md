@@ -137,6 +137,8 @@ Laravel follows **MVC**, which separates the application into three core layers:
 | [Validation](#Validation) |
 | [Error Handling](#Error-Handling) |
 | [Logging](#Logging) |
+| [Eloquent Relationships](#Eloquent-Relationships) |
+| [Seeders](#Seeders) |
 | [Laravel Artisan and Composer Command Cheatsheet](#Laravel-Artisan-and-Composer-Command-Cheatsheet) |
 | [Refresh Laravel Cache](#Refresh-Laravel-Cache) |
 | [Composer Commands](#Composer-Commands) |
@@ -807,6 +809,49 @@ public function commentable() {
   
 ##
 
+### Seeders
+
+Seeders in Laravel are used to populate your database tables with **dummy or initial data** for development and testing purposes.
+
+* ✅ What is a Seeder?
+
+- A Seeder is a class that inserts records into your database.
+- Stored in `database/seeders/`.
+- Can call multiple seeders from a single file (e.g. `DatabaseSeeder.php`).
+- Mostly used with factories or for inserting static default data.
+
+* 🛠️ Creating a Seeder
+
+```bash
+php artisan make:seeder UserSeeder
+```
+This creates a file at:
+database/seeders/UserSeeder.php
+
+✍️ Writing a Seeder
+Insert single or multiple records using Eloquent:
+```
+// database/seeders/UserSeeder.php
+
+use App\Models\User;
+use Illuminate\Database\Seeder;
+
+class UserSeeder extends Seeder {
+    public function run() {
+        User::create([
+            'name' => 'Admin',
+            'email' => 'admin@example.com',
+            'password' => bcrypt('password'),
+        ]);
+    }
+}
+```
+<br>
+
+
+  **[⬆ Back to Top](#Basics)**
+  
+##
 
 ### Laravel Artisan and Composer Command Cheatsheet
 
