@@ -292,14 +292,28 @@ Route::get('/user/{id}', [UserController::class, 'show']);
 
 ### Requests
 
+- In Laravel, the `Illuminate\Http\Request` class is used to handle incoming HTTP requests.
 - To obtain an instance of the current HTTP request via dependency injection, you should type-hint the Illuminate\Http\Request class on your route closure or controller method. The incoming request instance will automatically be injected by the Laravel service container:
 
-Access user input data.
+To obtain the request instance, type-hint it in your controller method or route closure:
+```php
+use Illuminate\Http\Request;
+```
+
+Accessing user Input Data
 ```php
 public function store(Request $request) {
     $name = $request->input('name');
     return "Hello $name";
 }
+```
+
+Validate Directly in Controller
+```
+$request->validate([
+    'name' => 'required|string',
+    'email' => 'required|email|unique:users',
+]);
 ```
 
 
@@ -312,12 +326,32 @@ public function store(Request $request) {
 
 ### Responses
 
+- In Laravel, all routes and controllers should return a **response** to be sent back to the browser/client.
+- You can return strings, views, JSON, files, or even full response objects with headers and cookies.
+
 Return various responses to client.
 ```php
 return response('Hello', 200)
             ->header('Content-Type', 'text/plain');
 ```
 
+JSON Responses
+Use response()->json() to return JSON manually:
+```
+return response()->json([
+    'success' => true,
+    'user' => [
+        'name' => 'Ayush',
+        'email' => 'ayush@example.com'
+    ]
+]);
+```
+
+Set status codes and headers:
+```
+return response()->json($data, 201)
+    ->header('X-Custom-Header', 'value');
+```
 
 <br>
 
@@ -347,7 +381,7 @@ return view('welcome');
 
 ##
 
-🖋 Blade Templates
+### Blade Templates
 
 - Blade is Laravel’s built-in templating engine.
 - It is simple yet powerful, designed specifically for Laravel views.
@@ -500,6 +534,32 @@ class ProductController extends Controller
 }
 ```
 
+- 🧠 Session vs Cookie in Laravel
+
+| Feature                    | **Session**                                                                 | **Cookie**                                                                |
+|----------------------------|------------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| **Storage Location**       | Stored on **server-side** (file, database, Redis, etc.)                     | Stored on **client's browser**                                           |
+| **Data Size Limit**        | Large (depends on storage driver)                                           | Limited (~4KB max per cookie)                                            |
+| **Security**               | More secure (data is not exposed to user)                                   | Less secure (user can view and modify unless encrypted)                  |
+| **Default Expiry**         | Until browser is closed (or set by developer)                               | Can be short-lived or long-lived (set by developer)                      |
+| **Laravel Access**         | `session('key')` or `$request->session()->get('key')`                       | `$request->cookie('key')` and `response()->cookie()`                     |
+| **Usage Example**          | Flash messages, authenticated user data, cart/session tokens                | User preferences, remember-me tokens                                     |
+| **Can be Encrypted?**      | Yes, automatically handled by Laravel                                        | Yes, Laravel encrypts by default if `EncryptCookies` middleware is used  |
+| **Configuration File**     | `config/session.php`                                                        | `config/session.php` (lifetime setting for cookies stored via session)   |
+| **Set by**                 | `session(['key' => 'value'])`                                               | `cookie('key', 'value', $minutes)`                                       |
+| **Lifetime Control**       | `lifetime` in `config/session.php`                                          | Passed as argument when setting cookie                                   |
+| **Flash Data Support**     | ✅ Yes, using `session()->flash()`                                           | ❌ Not natively, you'd need to handle manually                           |
+
+
+```
+// Store and retrieve session data
+session(['user_id' => 123]);
+$userId = session('user_id');
+
+// Store and retrieve cookies
+$response = response('Hello')->cookie('name', 'Ayush', 60);
+$name = $request->cookie('name');
+```
 
 <br>
 
@@ -748,13 +808,37 @@ Log::error('Something went wrong');
 
 ### Git Commands
 
-| **Purpose**         | **Command**               |
-| ------------------- | ------------------------- |
-| Check status        | `git status`              |
-| Add all files       | `git add .`               |
-| Commit with message | `git commit -m "message"` |
-| Pull latest changes | `git pull`                |
-| Push to repo        | `git push`                |
+| **Purpose**                     | **Command**                                   |
+|--------------------------------|-----------------------------------------------|
+| Check status                   | `git status`                                  |
+| Add all files                  | `git add .`                                   |
+| Commit with message            | `git commit -m "message"`                     |
+| Pull latest changes            | `git pull`                                    |
+| Push to repo                   | `git push`                                    |
+| Clone a repository             | `git clone <repo-url>`                        |
+| Initialize a Git repo          | `git init`                                    |
+| Check commit log               | `git log`                                     |
+| See short commit history       | `git log --oneline`                           |
+| Create new branch              | `git branch <branch-name>`                    |
+| List all branches              | `git branch`                                  |
+| Switch to a branch             | `git checkout <branch-name>`                 |
+| Create & switch branch         | `git checkout -b <branch-name>`              |
+| Merge a branch                 | `git merge <branch-name>`                    |
+| Delete local branch            | `git branch -d <branch-name>`                |
+| Delete remote branch           | `git push origin --delete <branch-name>`     |
+| Stash current changes          | `git stash`                                   |
+| Apply last stash               | `git stash apply`                             |
+| View stashed changes           | `git stash list`                              |
+| Remove a file from staging     | `git reset <file>`                            |
+| Remove all files from staging  | `git reset`                                   |
+| Undo last commit (keep files)  | `git reset --soft HEAD~1`                     |
+| Undo last commit (remove files)| `git reset --hard HEAD~1`                     |
+| Add remote URL                 | `git remote add origin <url>`                 |
+| Change remote URL              | `git remote set-url origin <new-url>`         |
+| Check current remote URL       | `git remote -v`                               |
+| View difference (unstaged)     | `git diff`                                    |
+| View difference (staged)       | `git diff --cached`                           |
+
 
 
 
