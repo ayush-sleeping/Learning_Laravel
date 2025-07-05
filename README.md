@@ -742,7 +742,7 @@ Log::error('Something went wrong');
 ##
 
 
-## 🔗 Eloquent Relationships
+### Eloquent Relationships
 
 - Eloquent relationships allow different database tables to be **connected logically** using Laravel models.
 - It provides an elegant, readable way to work with relational data.
