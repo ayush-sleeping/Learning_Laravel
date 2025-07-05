@@ -134,6 +134,7 @@ Laravel follows **MVC**, which separates the application into three core layers:
 |36| [Service Providers](#Service-Providers)|
 |37| [Load one Million Records Efficiently](#Load-one-Million-Records-Efficiently)|
 |38| [Eager Loading n+1 problem](#Eager-Loading-n+1-problem)|
+|39| [Authentication vs Authorization](#Authentication-vs-Authorization)|
 
 
 ##
@@ -4262,6 +4263,36 @@ $posts->load('user');
 - Always use eager loading in loops to improve performance and reduce DB load
 
 > 🧠 Tip: Use Laravel Debugbar or Telescope to monitor queries and catch N+1 issues in development.
+
+  **[⬆ Back to Top](#Important-Commands)**
+
+
+
+##
+
+##
+
+
+39. Authentication vs Authorization
+
+
+| Aspect             | Authentication                          | Authorization                             |
+|--------------------|------------------------------------------|--------------------------------------------|
+| **Definition**     | The process of verifying **who the user is** | The process of verifying **what the user can access** |
+| **Purpose**        | Confirms user identity (e.g., login)     | Controls access to resources or actions     |
+| **Occurs When**    | Before authorization                     | After successful authentication             |
+| **Data Used**      | Username, password, tokens, OTPs         | User roles, permissions, access control lists (ACL) |
+| **Example**        | Login with email and password            | Admin can access dashboard, user can’t      |
+| **Laravel Tools**  | Sanctum, Passport, Laravel Breeze, Jetstream | Gates, Policies, Middleware                |
+| **Security Focus** | Who is trying to access the system       | What they are allowed to do                 |
+
+
+🔑 Quick Summary
+
+- **Authentication** = "Who are you?"
+- **Authorization** = "What are you allowed to do?"
+
+Both are critical for building secure web applications.
 
   **[⬆ Back to Top](#Important-Commands)**
 
