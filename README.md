@@ -12,12 +12,36 @@
 
 **Laravel** is a free, open-source PHP framework used to build modern web applications. It follows the **MVC (Model-View-Controller)** architecture and provides built-in tools like:
 
-* Routing
-* Authentication
-* Database Migration
-* Eloquent ORM
-* Blade Templating
-* RESTful API Support
+<details>
+  <summary>Routing</summary>
+  Laravel routes help connect URLs to specific functions or controllers. For example, `/home` can show the home page using a controller.
+</details>
+
+<details>
+  <summary>Authentication</summary>
+  Laravel provides built-in login and register system so only the right users can access protected parts of your app.
+</details>
+
+<details>
+  <summary>Database Migration</summary>
+  Migrations are like version control for your database. You write PHP code to create or update tables instead of doing it manually in SQL.
+</details>
+
+<details>
+  <summary>Eloquent ORM</summary>
+  Eloquent is Laravel’s way to interact with database tables using simple PHP code instead of complex SQL queries.
+</details>
+
+<details>
+  <summary>Blade Templating</summary>
+  Blade is Laravel’s templating engine that lets you write dynamic HTML pages using `@` syntax like `@if`, `@foreach`, etc.
+</details>
+
+<details>
+  <summary>RESTful API Support</summary>
+  Laravel makes it easy to build APIs where each URL is used to create, read, update, or delete data in a standard way.
+</details>
+
 
 It simplifies repetitive tasks like routing, sessions, and caching, allowing developers to write **clean, secure, and scalable code faster**.
 
@@ -172,6 +196,33 @@ Route::get('/', function () { return view('welcome'); });
 
 Route::resource('articles', ArticleController::class);
 ```
+
+<details> <summary>🔍 Common Routing Concepts : </summary>
+ 
+Difference between GET and POST method
+- GET is used to request data from the server (like reading).
+- POST is used to send data to the server (like submitting a form).
+
+RESTful routes in Laravel
+- Laravel uses 7 standard routes for a resource like articles:
+- index, create, store, show, edit, update, destroy.
+- These follow HTTP methods: GET, POST, PUT, DELETE.
+  
+Route::resource()
+- It's a shortcut that creates all 7 RESTful routes for a controller in one line.
+  
+Difference between Route::get() and Route::post()?
+- Route::get() is used to fetch or display something.
+- Route::post() is used to submit form data (like creating something new).
+  
+Route naming in Laravel
+- Using ->name('articles.store') allows you to reference the route by name, useful in forms or redirects.
+
+Difference between web.php and api.php?
+- web.php is for browser-based routes (includes session, CSRF).
+- api.php is for API routes (stateless, no sessions or CSRF).
+</details> 
+
 
 <br>
 
