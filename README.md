@@ -1,5 +1,5 @@
 # Learning_Laravel
-> "I've been learning and using Laravel a lot for my internship as a FullStack Developer. To keep everything organized, I made a special collection of important code and notes. This collection is like a big container that holds all the things I've learned about Laravel, starting from the basics to the more advanced stuff. .... "
+> "I've been learning and using Laravel a lot for my job as a FullStack Developer. To keep everything organized, I made a special collection of important code and notes. This collection is like a big container that holds all the things I've learned about Laravel, starting from the basics to the more advanced stuff. .... "
 
 ---
 
@@ -124,10 +124,10 @@ Laravel follows **MVC**, which separates the application into three core layers:
 |26| [Events vs Listeners](#Events-vs-Listeners)|
 |27| [Laravel Observer](#Laravel-Observer)|
 |28| [API Resources](#API-Resources)|
-|29| [Why use Guard](#Why-use-Guard)|
-|30| [Why use App key](#Why-use-App-key)|
-|31| [Official packages](#Official-packages)|
-|32| [API Status Codes](#API-Status-Codes)|)|
+|29| [API Status Codes](#API-Status-Codes)|)|
+|30| [Why use Guard](#Why-use-Guard)|
+|31| [Why use App key](#Why-use-App-key)|
+|32| [Official packages](#Official-packages)|
 |33| [ENV variable](#Env-variable)|
 |34| [Service Container](#Service-Container)|
 |35| [Dependency Injection](#Dependency-Injection)|
@@ -135,6 +135,12 @@ Laravel follows **MVC**, which separates the application into three core layers:
 |37| [Load one Million Records Efficiently](#Load-one-Million-Records-Efficiently)|
 |38| [Eager Loading n+1 problem](#Eager-Loading-n+1-problem)|
 |39| [Authentication vs Authorization](#Authentication-vs-Authorization)|
+
+
+|40| [Designing Patterns](#Designing-Patterns)|
+|0 | [Basics](#Basics)|
+|0 | [Basics](#Basics)|
+|0 | [Basics](#Basics)|
 
 
 ##
@@ -3114,15 +3120,10 @@ Avoid if:
 
 28. ### API Resources
 
-
 **Laravel API Resources** are a convenient way to transform your **Eloquent models and collections** into JSON responses for APIs in a **clean, customizable, and structured** format.
-
 > Think of them as “data transformers” between your models and the JSON output sent to frontend or third-party consumers.
 
-
-
 🔧 When to Use API Resources?
-
 - When building RESTful APIs or JSON APIs.
 - When you want **consistent response formatting**.
 - To hide sensitive model attributes (like passwords).
@@ -3188,7 +3189,6 @@ public function toArray($request)
 Use whenLoaded() to conditionally load relationships (avoid N+1 problem).
 
 ✨ Conditional Attributes
-
 ```php
 return [
     'email' => $this->when(auth()->user()->isAdmin(), $this->email),
@@ -3196,14 +3196,11 @@ return [
 ```
 
 🔐 Hide or Format Fields
-
 - Easily hide sensitive fields like passwords.
 - Format timestamps, booleans, or enums into human-readable values.
 
 🧰 Resource Collections
-
 By default, UserResource::collection($users) returns a ResourceCollection that wraps data in:
-
 ```php
 {
     "data": [ ... ]
@@ -3211,7 +3208,6 @@ By default, UserResource::collection($users) returns a ResourceCollection that w
 ```
 
 You can customize it by creating:
-
 ```bash
 php artisan make:resource UserCollection
 ```
@@ -3227,13 +3223,230 @@ php artisan make:resource UserCollection
 
 
 🔚 Summary
-
 - API Resources = Data transformers for JSON APIs.
 - Helps keep your API responses consistent and clean.
 - Useful for both single models and collections.
 - Can include, exclude, or format data conditionally.
 
 🚀 API Resources keep your controller light and your JSON smart!
+
+<br>
+
+
+
+<br>
+
+
+* 📘 API Documentation
+
+🔧 Tools:
+- Postman Collections
+- Swagger (Laravel: `l5-swagger`)
+- Manual Markdown
+
+```bash
+composer require "darkaonline/l5-swagger"
+```
+
+
+
+* 🔐 Laravel API Authentication
+
+| Type        | Token Storage               | Package             | Best For                |
+|-------------|------------------------------|----------------------|--------------------------|
+| Token       | users.api_token              | Built-in             | Small APIs               |
+| Sanctum     | personal_access_tokens table | laravel/sanctum      | SPA, mobile apps         |
+| Passport    | oauth tables                 | laravel/passport     | OAuth2, third parties    |
+| JWT         | Stored client-side only      | tymon/jwt-auth       | Stateless APIs           |
+
+📌 Token Generation
+
+**Sanctum**
+```php
+$token = $user->createToken('MyApp')->plainTextToken;
+```
+
+**JWT**
+```php
+$token = JWTAuth::attempt(['email' => $email, 'password' => $password]);
+```
+
+**Passport**
+```bash
+php artisan passport:install
+```
+
+<br>
+
+* 🔍 Authenticated API Routes
+
+Use middleware:
+```php
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
+```
+
+Pass token:
+```http
+Authorization: Bearer <token>
+```
+
+<br>
+
+* 🛡️ CSRF Token in APIs
+
+- CSRF protection **only applies to web routes**
+- APIs inside `routes/api.php` do not require CSRF tokens
+- If you get a CSRF error, make sure:
+  - You’re not sending form data to `web.php` routes
+
+
+
+* 🧩 Key Concepts
+
+| Concept         | Purpose                                  |
+|------------------|------------------------------------------|
+| Middleware       | Protect routes using `auth:*` guards     |
+| Guards           | Define how users are authenticated       |
+| Bearer Token     | Standard for sending tokens in headers   |
+| Stateless APIs   | No session, only token-based             |
+
+
+
+* 🌐 Types of APIs
+
+| Type        | Format | Description                         |
+|-------------|--------|-------------------------------------|
+| REST        | JSON   | Standard API for most apps          |
+| GraphQL     | JSON   | Flexible queries, single endpoint   |
+| SOAP        | XML    | Old enterprise systems              |
+| Webhooks    | JSON   | Event-triggered HTTP callbacks      |
+
+
+
+* 🧾 REST vs GraphQL vs SOAP
+
+| Feature       | REST           | GraphQL         | SOAP         |
+|---------------|----------------|------------------|--------------|
+| Format        | JSON           | JSON             | XML          |
+| Flexibility   | Medium         | High             | Low          |
+| Laravel Ready | Yes            | Via Package      | No (custom)  |
+
+
+
+* ✅ Summary
+
+- Use Laravel Sanctum or Passport for modern API authentication
+- Protect your routes with middleware
+- Use API Resources for clean output
+- Document your APIs using Swagger or Postman
+- CSRF is not required in API routes (`api.php`)
+- Understand different API types and choose accordingly
+
+
+
+🔁 Example Protected Route:
+```php
+Route::middleware('auth:sanctum')->get('/user', function () {
+    return auth()->user();
+});
+```
+
+<br>
+
+
+
+<br>
+
+ * 📤  API Status Codes
+
+In Laravel, when building APIs (especially RESTful APIs), it's important to return appropriate **HTTP status codes** along with your JSON responses. These codes help the client understand what happened with the request — whether it succeeded, failed, or encountered an error.
+
+✅ 1xx - Informational
+> Rarely used in APIs.
+
+✅ 2xx - Success
+
+| Code | Meaning                  | When to Use                                     |
+|------|--------------------------|--------------------------------------------------|
+| 200  | OK                       | Successful GET, PUT, PATCH, or DELETE request   |
+| 201  | Created                  | Resource was successfully created (POST)        |
+| 202  | Accepted                 | Request accepted for processing (async ops)     |
+| 204  | No Content               | Successful request, but no content to return    |
+
+🧠 **Laravel Example:**
+```php
+return response()->json(['message' => 'Created'], 201);
+```
+
+❗ 3xx - Redirection
+Not commonly used in APIs, mostly for browser-based requests.
+
+⚠️ 4xx - Client Errors
+
+| Code | Meaning              | When to Use                                            |
+| ---- | -------------------- | ------------------------------------------------------ |
+| 400  | Bad Request          | Invalid request data or parameters                     |
+| 401  | Unauthorized         | Authentication required or failed                      |
+| 403  | Forbidden            | Authenticated but not authorized                       |
+| 404  | Not Found            | Resource does not exist                                |
+| 405  | Method Not Allowed   | HTTP method not allowed on this route                  |
+| 422  | Unprocessable Entity | Validation error (most common for form/API validation) |
+
+
+🧠 Laravel Example:
+```php
+return response()->json(['error' => 'Unauthorized'], 401);
+
+return response()->json(['errors' => $validator->errors()], 422);
+```
+
+❌ 5xx - Server Errors
+| Code | Meaning               | When to Use                                           |
+| ---- | --------------------- | ----------------------------------------------------- |
+| 500  | Internal Server Error | Unexpected error on the server                        |
+| 503  | Service Unavailable   | Server temporarily overloaded or down for maintenance |
+
+🧠 Laravel handles most 500 errors via the ExceptionHandler.
+
+🛠 Laravel Tips
+
+🔁 Returning Status Codes in JSON:
+```php
+return response()->json(['message' => 'Success'], 200);
+```
+
+🧪 Validating and Returning 422:
+```php
+$request->validate([
+    'email' => 'required|email',
+]);
+// Laravel will automatically return 422 if validation fails
+```
+
+🧾 Using Custom Response Classes:
+Use Laravel Resources or custom Response macros to standardize response format with correct codes.
+
+📌 Summary Table
+
+| Code | Type    | Meaning                           |
+| ---- | ------- | --------------------------------- |
+| 200  | Success | OK                                |
+| 201  | Success | Created                           |
+| 204  | Success | No Content                        |
+| 400  | Client  | Bad Request                       |
+| 401  | Client  | Unauthorized                      |
+| 403  | Client  | Forbidden                         |
+| 404  | Client  | Not Found                         |
+| 405  | Client  | Method Not Allowed                |
+| 422  | Client  | Unprocessable Entity (Validation) |
+| 500  | Server  | Internal Server Error             |
+| 503  | Server  | Service Unavailable               |
+
+✅ Correct usage of status codes improves API communication, error handling, and client-side debugging
+
+
 
   **[⬆ Back to Top](#Important-Commands)**
 
@@ -3242,6 +3455,7 @@ php artisan make:resource UserCollection
 ##
 
 ##
+
 
 
 29. ### Why use Guard
@@ -3537,114 +3751,6 @@ Laravel offers several **first-party official packages** developed and maintaine
 
 
 > ✅ These official Laravel packages are designed to solve **common development needs** with robust and elegant solutions backed by the Laravel core team.
-
-
-  **[⬆ Back to Top](#Important-Commands)**
-
-
-
-##
-
-##
-
-
-
-32. ### API Status Codes
-
-
-In Laravel, when building APIs (especially RESTful APIs), it's important to return appropriate **HTTP status codes** along with your JSON responses. These codes help the client understand what happened with the request — whether it succeeded, failed, or encountered an error.
-
-
-✅ 1xx - Informational
-> Rarely used in APIs.
-
-
-
-✅ 2xx - Success
-
-| Code | Meaning                  | When to Use                                     |
-|------|--------------------------|--------------------------------------------------|
-| 200  | OK                       | Successful GET, PUT, PATCH, or DELETE request   |
-| 201  | Created                  | Resource was successfully created (POST)        |
-| 202  | Accepted                 | Request accepted for processing (async ops)     |
-| 204  | No Content               | Successful request, but no content to return    |
-
-🧠 **Laravel Example:**
-```php
-return response()->json(['message' => 'Created'], 201);
-```
-
-
-❗ 3xx - Redirection
-
-Not commonly used in APIs, mostly for browser-based requests.
-
-⚠️ 4xx - Client Errors
-
-| Code | Meaning              | When to Use                                            |
-| ---- | -------------------- | ------------------------------------------------------ |
-| 400  | Bad Request          | Invalid request data or parameters                     |
-| 401  | Unauthorized         | Authentication required or failed                      |
-| 403  | Forbidden            | Authenticated but not authorized                       |
-| 404  | Not Found            | Resource does not exist                                |
-| 405  | Method Not Allowed   | HTTP method not allowed on this route                  |
-| 422  | Unprocessable Entity | Validation error (most common for form/API validation) |
-
-
-🧠 Laravel Example:
-
-```php
-return response()->json(['error' => 'Unauthorized'], 401);
-
-return response()->json(['errors' => $validator->errors()], 422);
-```
-
-❌ 5xx - Server Errors
-
-| Code | Meaning               | When to Use                                           |
-| ---- | --------------------- | ----------------------------------------------------- |
-| 500  | Internal Server Error | Unexpected error on the server                        |
-| 503  | Service Unavailable   | Server temporarily overloaded or down for maintenance |
-
-🧠 Laravel handles most 500 errors via the ExceptionHandler.
-
-🛠 Laravel Tips
-
-🔁 Returning Status Codes in JSON:
-```php
-return response()->json(['message' => 'Success'], 200);
-```
-
-🧪 Validating and Returning 422:
-```php
-$request->validate([
-    'email' => 'required|email',
-]);
-// Laravel will automatically return 422 if validation fails
-```
-
-🧾 Using Custom Response Classes:
-Use Laravel Resources or custom Response macros to standardize response format with correct codes.
-
-📌 Summary Table
-
-| Code | Type    | Meaning                           |
-| ---- | ------- | --------------------------------- |
-| 200  | Success | OK                                |
-| 201  | Success | Created                           |
-| 204  | Success | No Content                        |
-| 400  | Client  | Bad Request                       |
-| 401  | Client  | Unauthorized                      |
-| 403  | Client  | Forbidden                         |
-| 404  | Client  | Not Found                         |
-| 405  | Client  | Method Not Allowed                |
-| 422  | Client  | Unprocessable Entity (Validation) |
-| 500  | Server  | Internal Server Error             |
-| 503  | Server  | Service Unavailable               |
-
-
-✅ Correct usage of status codes improves API communication, error handling, and client-side debugging
-
 
 
   **[⬆ Back to Top](#Important-Commands)**
@@ -4273,7 +4379,7 @@ $posts->load('user');
 ##
 
 
-39. Authentication vs Authorization
+39. ### Authentication vs Authorization
 
 
 | Aspect             | Authentication                          | Authorization                             |
@@ -4293,6 +4399,64 @@ $posts->load('user');
 - **Authorization** = "What are you allowed to do?"
 
 Both are critical for building secure web applications.
+
+  **[⬆ Back to Top](#Important-Commands)**
+
+
+
+##
+
+##
+
+
+
+40. ### Designing Patterns
+
+
+In Laravel, “designing patterns” refers to using **Software Design Patterns** to build scalable, maintainable, and clean backend systems.
+Laravel already uses several design patterns internally, and you as a developer can apply them in your own code.
+
+
+* ✅ What Are Design Patterns?
+
+Design patterns are **standard solutions** to common programming problems. They make your code:
+- Easier to maintain
+- Reusable and testable
+- Aligned with SOLID principles
+
+
+* ⚙️ Common Design Patterns in Laravel
+
+| Pattern               | Purpose                                                                  | Laravel Usage Example                 |
+|----------------------|--------------------------------------------------------------------------|----------------------------------------|
+| **MVC**              | Separates business logic, UI, and data                                   | Core Laravel architecture             |
+| **Repository**       | Separates database logic from controllers                                | Abstracting Eloquent queries          |
+| **Service**          | Moves business logic out of controllers                                  | Order, billing, or payment logic      |
+| **Factory**          | Creates objects without new keyword                                      | Laravel Model Factories               |
+| **Observer**         | Listens to model events (create/update/delete)                           | Model Observers (`booted()`)          |
+| **Strategy**         | Allows selecting algorithms/behaviors at runtime                         | Filtering, payment methods, etc.      |
+| **Singleton**        | One instance of a class shared globally                                  | `App::singleton()` binding            |
+| **Command**          | Encapsulates tasks as objects                                            | Artisan commands                      |
+| **Decorator**        | Add behavior to an object dynamically                                    | Middleware system                     |
+
+
+* Why Use Design Patterns?
+  
+- Helps follow SOLID principles
+- Makes code modular and testable
+- Easier to extend and refactor
+- Used in professional-grade Laravel apps
+
+
+  **[⬆ Back to Top](#Important-Commands)**
+
+
+
+##
+
+##
+
+41. ### 
 
   **[⬆ Back to Top](#Important-Commands)**
 
