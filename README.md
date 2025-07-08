@@ -93,53 +93,97 @@ Laravel follows **MVC**, which separates the application into three core layers:
 
 ### Important Concepts
 
-| No. | Topics |
-|---- | ---------
-|0 | [Basics](#Basics)|
-|1 | [How to Install Laravel](#Install-Laravel)|
-|2 | [Creating a New Project](#New-Project)|
-|3 | [Running Your Project in the Browser](#Run-your-Project-in-browser)|
-|4 | [Updating Composer](#Update-Composer)|
-|5 | [Making a Model in Laravel](#Making-a-Model-in-Laravel)|
-|6 | [Creating a Migration File & Migrate the migration file](#Creating-a-Migration-File)|
-|7 | [Generating a Controller File](#Generating-a-Controller-File)|
-|8 | [Understanding Route Lists](#Understanding-Route-Lists)|
-|9 | [Migrating & Seed Your Database](#Migrating-&-Seed-Your-Database)|
-|10| [Generating an Application Key](#Generating-an-Application-Key)|
-|11| [Creating a Storage Link](#Creating-a-Storage-Link)|
-|12| [Refreshing Laravel's Memory](#Refreshing-Laravel's-Memory)|
-|13| [Understanding CRUD Project Flow](#Understanding-CRUD-Project-Flow)|
-|14| [Laravel Request Lifecycle](#Laravel-Request-LifeCycle)|
-|15| [Overview of Laravel Versions in recent years](#Laravel-versions-lately)|
-|16| [Artisan Console](#Artisan-Console)|
-|17| [Difference between Composer.json vs Composoer.lock](#Difference-between-Composer.json-vs-Composoer.lock)|
-|18| [Default Route Files](#Default-Route-Files-in-Laravel)|
-|19| [Middleware and Global Middleware](#Middleware-and-Global-Middleware)|
-|20| [Gates vs Policies](#Gates-vs-Policies)|
-|21| [Eloquent vs Query Builder](#Eloquent-vs-Query-Builder-in-Laravel)|
-|22| [Migrate fresh vs Migrate refresh](#Migrate-fresh-vs-Migrate-refresh)|
-|23| [Factories vs Seeders](#Factories-vs-Seeders)|
-|24| [Databases Laravel Support](#Databases-Laravel-Support)|
-|25| [Soft Deletes](#Soft-Deletes)|
-|26| [Events vs Listeners](#Events-vs-Listeners)|
-|27| [Laravel Observer](#Laravel-Observer)|
-|28| [API Resources](#API-Resources)|
-|29| [API Status Codes](#API-Status-Codes)|)|
-|30| [Why use Guard](#Why-use-Guard)|
-|31| [Why use App key](#Why-use-App-key)|
-|32| [Official packages](#Official-packages)|
-|33| [ENV variable](#Env-variable)|
-|34| [Service Container](#Service-Container)|
-|36| [Service Providers](#Service-Providers)|
-|35| [Service Container vs Service Provider](#Service-Container-vs-Service-Provider) |
-|35| [Dependency Injection](#Dependency-Injection)|
-|37| [Load one Million Records Efficiently](#Load-one-Million-Records-Efficiently)|
-|38| [Eager Loading n+1 problem](#Eager-Loading-n+1-problem)|
-|39| [Authentication vs Authorization](#Authentication-vs-Authorization)|
-|40| [Designing Patterns](#Designing-Patterns)|
-|0 | [Basics](#Basics)|
-|0 | [Basics](#Basics)|
-|0 | [Basics](#Basics)|
+### Beginner Level
+
+| No. | Topics                                                                                  |
+| --- | --------------------------------------------------------------------------------------- |
+| 0   | [Basics](#Basics)                                                                       |
+| 1   | [How to Install Laravel](#Install-Laravel)                                              |
+| 2   | [Creating a New Project](#New-Project)                                                  |
+| 3   | [Running Your Project in the Browser](#Run-your-Project-in-browser)                     |
+| 4   | [Updating Composer](#Update-Composer)                                                   |
+| 5   | [Making a Model in Laravel](#Making-a-Model-in-Laravel)                                 |
+| 6   | [Creating a Migration File & Migrate the migration file](#Creating-a-Migration-File)    |
+| 7   | [Generating a Controller File](#Generating-a-Controller-File)                           |
+| 8   | [Understanding Route Lists](#Understanding-Route-Lists)                                 |
+| 9   | [Migrating & Seed Your Database](#Migrating-&-Seed-Your-Database)                       |
+| 10  | [Generating an Application Key](#Generating-an-Application-Key)                         |
+| 11  | [Creating a Storage Link](#Creating-a-Storage-Link)                                     |
+| 12  | [Refreshing Laravel's Memory](#Refreshing-Laravel's-Memory)                             |
+| 13  | [Understanding CRUD Project Flow](#Understanding-CRUD-Project-Flow)                     |
+| 14  | [Laravel Request Lifecycle](#Laravel-Request-LifeCycle)                                 |
+| 15  | [Artisan Console](#Artisan-Console)                                                     |
+| 16  | [Default Route Files](#Default-Route-Files-in-Laravel)                                  |
+| 17  | [Composer](#composer)                                                                   |
+| 18  | [Requests methods](#requests-methods)                                                   |
+| 19  | [Request Input vs Get](#request-input-vs-get)                                           |
+| 20  | [Generating URL](#generating-url)                                                       |
+| 21  | [Authentication vs Authorization](#Authentication-vs-Authorization)                     |
+| 22  | [Difference between Auth Attempt and Check](#difference-between-auth-attempt-and-check) |
+| 23  | [Guard](#guard)                                                                         |
+| 24  | [Purpose of Tinker](#purpose-of-tinker)                                                 |
+| 25  | [find vs where](#find-vs-where)                                                         |
+| 26  | [Soft Deletes](#Soft-Deletes)                                                           |
+| 27  | [SQL Injection and Secure Query](#sql-injection-and-secure-query)                       |
+| 28  | [Migrate fresh vs Migrate refresh](#Migrate-fresh-vs-Migrate-refresh)                   |
+| 29  | [Factories vs Seeders](#Factories-vs-Seeders)                                           |
+| 30  | [ENV variable](#Env-variable)                                                           |
+| 31  | [Namespace in Laravel](#namespace-in-laravel)                                           |
+| 32  | [App directory](#app-directory)                                                         |
+| 33  | [Config folder](#config-folder)                                                         |
+| 34  | [Storage directory](#storage-directory)                                                 |
+| 35  | [Helper functions in Laravel](#helpers-and-helper-functions)                            |
+| 36  | [Resources](#resources)                                                                 |
+
+### Intermediate Level
+
+| No. | Topics                                                                            |
+| --- | --------------------------------------------------------------------------------- |
+| 37  | [Gates vs Policies](#Gates-vs-Policies)                                           |
+| 38  | [Eloquent vs Query Builder](#Eloquent-vs-Query-Builder-in-Laravel)                |
+| 39  | [Model Query Joins vs Relationships](#model-query-joins-vs-relationships)         |
+| 40  | [Events and Listeners](#events-and-listeners)                                     |
+| 41  | [Active listener](#active-listener)                                               |
+| 42  | [Observer](#observer)                                                             |
+| 43  | [API Resources](#API-Resources)                                                   |
+| 44  | [API Status Codes](#API-Status-Codes)                                             |
+| 45  | [Accessors Mutators](#accessors-mutators)                                         |
+| 46  | [How function gets called in automation](#how-function-gets-called-in-automation) |
+| 47  | [Facades](#facades)                                                               |
+| 48  | [Contract](#contract)                                                             |
+| 49  | [Dependency Injection](#dependency-injection)                                     |
+| 50  | [Debug Log](#debug-log)                                                           |
+| 51  | [Caching in Laravel](#caching-in-laravel)                                         |
+| 52  | [States](#states)                                                                 |
+| 53  | [Policies and Gates](#policies-and-gates)                                         |
+| 54  | [Laravel Compared to Other Frameworks](#laravel-compared-to-other-frameworks)     |
+| 55  | [Designing Patterns](#Designing-Patterns)                                         |
+| 56  | [Eager Loading n+1 problem](#Eager-Loading-n+1-problem)                           |
+| 57  | [Load one Million Records Efficiently](#Load-one-Million-Records-Efficiently)     |
+| 58  | [Service Container](#Service-Container)                                           |
+| 59  | [Service Providers](#Service-Providers)                                           |
+| 60  | [Service Container vs Service Provider](#Service-Container-vs-Service-Provider)   |
+
+### Advanced / Senior Level
+
+| No. | Topics                                                                                                    |
+| --- | --------------------------------------------------------------------------------------------------------- |
+| 61  | [Queue and Jobs](#queue-and-jobs)                                                                         |
+| 62  | [Schedular](#schedular)                                                                                   |
+| 63  | [Cron](#cron)                                                                                             |
+| 64  | [LiveWire](#livewire)                                                                                     |
+| 65  | [Echo](#echo)                                                                                             |
+| 66  | [WebSockets](#websockets)                                                                                 |
+| 67  | [Credentials and tokens](#credentials-and-tokens)                                                         |
+| 68  | [Why use Guard](#Why-use-Guard)                                                                           |
+| 69  | [Why use App key](#Why-use-App-key)                                                                       |
+| 70  | [Official packages](#Official-packages)                                                                   |
+| 71  | [Monolithic, ServerLess and MicroServices](#monolithic-serverless-and-microservices)                      |
+| 72  | [Generating a Controller File](#Generating-a-Controller-File)                                             |
+| 73  | [Overview of Laravel Versions in recent years](#Laravel-versions-lately)                                  |
+| 74  | [Difference between Composer.json vs Composoer.lock](#Difference-between-Composer.json-vs-Composoer.lock) |
+| 75  | [Databases Laravel Support](#Databases-Laravel-Support)                                                   |
+
 
 
 ##
@@ -6831,7 +6875,7 @@ class ReportService {
 
 ##
 
-69. ### Debug Log
+70. ### Debug Log
 - In Laravel, you can use the built-in **logging** functionality to debug and log messages.
 - Laravel uses the **Monolog** library under the hood, which provides a powerful logging system
 
@@ -6897,7 +6941,7 @@ Summary
 
 ##
 
-69. ### Caching in Laravel
+71. ### Caching in Laravel
 
 - Caching is used to **store data temporarily** to improve application performance by reducing unnecessary database or computation load.
 - Laravel provides a **unified API for various cache systems** like file, database, Redis, Memcached, etc.
@@ -6983,7 +7027,7 @@ Cache::rememberForever('key', function () {
 
   ##
 
-70. ### States
+72. ### States
 
 - In Laravel, "states" usually refer to **model states used during database seeding**, especially with **model factories**.
 - They help you define **custom variations** or conditions of a model's default data — useful for testing or demo content.
@@ -7066,7 +7110,7 @@ In simple words:
 
   ##
 
-71. ### Policies and Gates
+73. ### Policies and Gates
 Laravel provides **Gates** and **Policies** to handle **Authorization** – i.e., determining **what a user is allowed to do** (access control logic).
 
 #### ✅ Gates
@@ -7151,7 +7195,7 @@ class AuthServiceProvider extends ServiceProvider
 
   ##
 
-72. ### LiveWire
+74. ### LiveWire
 - **Laravel Livewire** is a **full-stack framework** that allows you to build **dynamic, reactive interfaces** using only Laravel and Blade, **without writing JavaScript**.
 - It uses **AJAX behind the scenes** to sync data between frontend and backend in real time.
 
@@ -7201,7 +7245,7 @@ php artisan make:livewire UserProfile
 
   ##
 
-73. ### Echo
+75. ### Echo
 
 - **Laravel Echo** is a JavaScript library that makes it easy to **subscribe to channels** and **listen for events** broadcast by your Laravel backend in **real time**.
 - It works with **Laravel Broadcasting** and tools like **Pusher** or **Socket.IO**.
@@ -7263,7 +7307,7 @@ php artisan make:event MessageSent
 
   ##
 
-74. ### WebSockets
+76. ### WebSockets
 - **WebSockets** provide a persistent, full-duplex communication channel between the **client** (browser) and the **server**. Unlike HTTP, which is request-response-based, WebSockets allow **real-time, two-way data exchange** without reloading the page.
 
 #### 🛠 Why use WebSockets in Laravel?
@@ -7303,7 +7347,7 @@ For production, remember to secure WebSocket connections with SSL.
 
   ##
 
-75. ### Monolithic, ServerLess and MicroServices
+77. ### Monolithic, ServerLess and MicroServices
 | Aspect                  | Monolithic                             | Microservices                                | Serverless                                       |
 |-------------------------|----------------------------------------|----------------------------------------------|--------------------------------------------------|
 | 🔧 **Definition**         | Single codebase for entire application | App split into independent services/modules   | Functions run in the cloud on-demand             |
