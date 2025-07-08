@@ -1394,7 +1394,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
 <br>
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -1417,7 +1417,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     This command installs Laravel globally on your system. It allows you to create new Laravel projects using the laravel new command.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1435,7 +1435,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     This command creates a new Laravel project with the specified name (app_name). It sets up the basic structure and necessary files for a Laravel application.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1458,7 +1458,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1483,7 +1483,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
    In some cases, you might need to update without considering platform requirements. This command allows you to update without checking PHP and extension versions.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1508,7 +1508,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1538,7 +1538,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1555,7 +1555,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     This command creates a new controller with resourceful methods (index, create, store, show, edit, update, destroy). Controllers handle user requests, process data, and interact with models.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -1573,7 +1573,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     This command displays a list of all registered routes for your application. It shows the HTTP methods, URI, controller, and middleware for each route.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -1603,7 +1603,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
    `db:seed` seeds the database without running migrations.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -1621,7 +1621,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     This command generates a new application key used for encryption and other security-related features in Laravel.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -1638,7 +1638,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     This command creates a symbolic link from the public/storage directory to the storage/app/public directory. It is used to make file uploads publicly accessible.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1680,7 +1680,7 @@ Laravel projects include some **auto-generated or sensitive files** that must be
     clears the configuration cache.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -1996,7 +1996,7 @@ Route::resource('articles', ArticleController::class);
 * [x] Manual testing done for all operations
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -2229,7 +2229,7 @@ Returns a response (```HTML/JSON/Redirect```)
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2337,7 +2337,7 @@ Syntax: <br>
 | ⚙️ Custom Commands   | `php artisan make:command`                             | Create your own CLI commands                 |
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -2382,7 +2382,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2426,7 +2426,7 @@ Key Files:
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2552,7 +2552,7 @@ public function destroy($id) {
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2598,7 +2598,7 @@ $email = request()->get('email', 'default@example.com');
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2674,7 +2674,7 @@ action([UserController::class, 'show'], ['id' => 1]);
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2704,7 +2704,7 @@ action([UserController::class, 'show'], ['id' => 1]);
 
 Both are critical for building secure web applications.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2766,7 +2766,7 @@ Summary
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2852,7 +2852,7 @@ Route::middleware('auth:web')->group(function () {
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2907,7 +2907,7 @@ $user->save();
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -2945,7 +2945,7 @@ $users = User::where('email', 'test@example.com')->get();
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -3040,7 +3040,7 @@ class User extends Model
 💡 Always check if you need to keep records for safety or compliance — soft deletes are perfect for that!
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3099,7 +3099,7 @@ $user = DB::select('SELECT * FROM users WHERE email = :email', ['email' => $emai
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -3189,7 +3189,7 @@ php artisan migrate:refresh --seed
 - Use migrate:refresh when you want to simulate rollback + migration cycle or test down() logic. <br>
 🧠 Pro Tip: Use --seed with either command if you want to re-run seeders along with migrations. <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3329,7 +3329,7 @@ public function run()
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3422,7 +3422,7 @@ php artisan config:clear   # Clears cached config
 
 > ✅ The .env file is essential for secure, flexible, and environment-agnostic Laravel applications.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3465,7 +3465,7 @@ Common Laravel Namespaces:
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3501,7 +3501,7 @@ It organizes your application logic cleanly and follows MVC structure.
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3543,7 +3543,7 @@ It centralizes and organizes how Laravel components should behave.
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3595,7 +3595,7 @@ It supports the runtime functioning of your Laravel app.
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3675,7 +3675,7 @@ Summary
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3749,7 +3749,7 @@ class UserResource extends JsonResource
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -3840,7 +3840,7 @@ if (Auth::user()->can('update', $post)) {
 * Use Policies when you need to group authorization logic around a specific Eloquent model.
 💡 Good Practice: For larger applications, prefer Policies for clean, maintainable, and scalable code.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -3947,7 +3947,7 @@ Use Query Builder When: <br>
 * Query Builder = Manual, SQL-like, better for complex or high-performance needs.
 * 💡 Pro Tip: You can mix both! Use Eloquent for most of your app, and switch to Query Builder when you need more control or optimization.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -4018,7 +4018,7 @@ Summary
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -4124,7 +4124,7 @@ event(new UserRegistered($user));
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -4170,7 +4170,7 @@ class EventServiceProvider extends ServiceProvider
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -4262,7 +4262,7 @@ public function boot()
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -4598,7 +4598,7 @@ Use Laravel Resources or custom Response macros to standardize response format w
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -4658,7 +4658,7 @@ $user->save(); // Saves the email as 'user@example.com'
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -4859,7 +4859,7 @@ class UserController extends Controller
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -4962,7 +4962,7 @@ MyCustomServiceFacade::performAction();
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -5031,7 +5031,7 @@ vendor/laravel/framework/src/Illuminate/Contracts/
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -5078,7 +5078,7 @@ class ReportService {
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -5144,7 +5144,7 @@ Summary
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -5230,7 +5230,7 @@ Cache::rememberForever('key', function () {
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
   ##
 
@@ -5313,7 +5313,7 @@ In simple words:
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
   ##
 
@@ -5398,7 +5398,7 @@ class AuthServiceProvider extends ServiceProvider
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
   ##
 
@@ -5457,7 +5457,7 @@ class AuthServiceProvider extends ServiceProvider
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -5503,7 +5503,7 @@ Design patterns are **standard solutions** to common programming problems. They 
 - Used in professional-grade Laravel apps
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -5590,7 +5590,7 @@ $posts->load('user');
 
 > 🧠 Tip: Use Laravel Debugbar or Telescope to monitor queries and catch N+1 issues in development.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -5712,7 +5712,7 @@ User::chunk(1000, function ($users) {
 - 🧰 Combine with Queues, Indexes, and Events disabling for best results.
 > ⚡ Laravel gives you multiple tools to handle large records efficiently — choose the right one based on the operation type (read/write/process).
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -5821,7 +5821,7 @@ public function register()
 > ✅ The Laravel Service Container is essential for managing dependencies and writing clean, scalable, testable code.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -5916,7 +5916,7 @@ public function boot()
 
 > 🚀 Mastering Service Providers helps you understand how Laravel starts, and how to configure your app properly from the ground up.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -5946,7 +5946,7 @@ public function boot()
 - **Service Container** is the **tool** Laravel uses to manage dependencies.
 - **Service Provider** is the **place** where you **tell Laravel what to register** into the container.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -6004,7 +6004,7 @@ Example Use Cases
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -6066,7 +6066,7 @@ protected function schedule(Schedule $schedule)
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -6124,7 +6124,7 @@ protected function schedule(Schedule $schedule)
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -6174,7 +6174,7 @@ php artisan make:livewire UserProfile
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
   ##
 
@@ -6236,7 +6236,7 @@ php artisan make:event MessageSent
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
   ##
 
@@ -6276,7 +6276,7 @@ For production, remember to secure WebSocket connections with SSL.
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
   ##
 
@@ -6366,7 +6366,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -6481,7 +6481,7 @@ Route::middleware('auth:admin')->group(function () {
 > 🧠 Think of a "guard" as the security gatekeeper — it checks how someone enters (session/token), while the "provider" defines who they are (model/table).
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -6543,7 +6543,7 @@ General encryption/decryption
 - Must be set before deploying the application.
 > ⚠️ Never share your APP_KEY publicly. Treat it like a password!
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -6667,7 +6667,7 @@ Laravel offers several **first-party official packages** developed and maintaine
 > ✅ These official Laravel packages are designed to solve **common development needs** with robust and elegant solutions backed by the Laravel core team.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -6707,7 +6707,7 @@ Laravel offers several **first-party official packages** developed and maintaine
 
 <br>
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 ##
 
@@ -6765,7 +6765,7 @@ Laravel offers several **first-party official packages** developed and maintaine
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 ##
@@ -6823,7 +6823,7 @@ Laravel offers several **first-party official packages** developed and maintaine
 
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -6881,7 +6881,7 @@ DB_PASSWORD=
 💡 Choose the database based on your project needs, performance, and deployment environment.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -7011,7 +7011,7 @@ Summary
 - Defined in the $middleware array in app/Http/Kernel.php.
 - Best for global concerns (like logging, security, CORS, maintenance).
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -7125,7 +7125,7 @@ Avoid if:
 🔁 Think of Observers as lifecycle hooks for your Eloquent models.
 
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
 
 
 
@@ -7222,4 +7222,4 @@ Laravel will automatically inject NotificationService when it creates UserContro
 
 > Laravel makes Dependency Injection seamless using its Service Container, promoting modern and testable PHP development practices.
 
-  **[⬆ Back to Top](#Important-Commands)**
+  **[⬆ Back to Top](#Important-Concepts)**
