@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="card-body">
-        <table class="table">
+        <table class="table table-bordered">
             <thead>
                 <th>No.</th>
                 <th>ID</th>
