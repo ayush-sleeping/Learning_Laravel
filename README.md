@@ -3,8 +3,7 @@
 
 > This repository is my personal collection of JavaScript notes, practice code snippets, and web development examples. It's built to help beginners and intermediate learners understand how JavaScript powers the web, and apply it in real-world scenarios like DOM manipulation, events, API handling, and more.
 
-Explore this repo to learn, revise, and build your frontend development skills 💻✨
----
+
 
 <br>
 
