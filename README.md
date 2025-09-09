@@ -1987,6 +1987,229 @@ Route::resource('articles', ArticleController::class);
 ```
 
 
+
+With Filters ::
+- Story Index File with Filter Example :
+```
+<section>
+    <h1>Stories</h1>
+    <a href="{{ route('stories.create') }}">
+        <button type="button">Create New Story</button>
+    </a>
+    <br><br>
+
+    <form id="filterForm" method="GET" action="{{ route('stories.index') }}" style="margin-bottom: 20px;">
+        <input type="text" id="search" name="search" placeholder="Search title or description"
+            value="{{ request('search') }}">
+        <select id="has_image" name="has_image">
+            <option value="">-- Image Filter --</option>
+            <option value="with" {{ request('has_image')=='with' ? 'selected' : '' }}>With Image</option>
+            <option value="without" {{ request('has_image')=='without' ? 'selected' : '' }}>Without Image</option>
+        </select>
+        <button type="submit">Filter</button>
+        <a href="{{ route('stories.index') }}">Reset</a>
+    </form>
+    <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="storiesTableBody">
+            @if(isset($stories) && count($stories) > 0)
+            @foreach($stories as $story)
+            <tr>
+                <td>{{ $story->id }}</td>
+                <td>{{ $story->title }}</td>
+                <td>{{ $story->description }}</td>
+                <td>
+                    @if($story->image)
+                    <img src="{{ asset('storage/' . $story->image) }}" alt="Story Image" width="80">
+                    @endif
+                </td>
+                <td>
+                    <a href="{{ route('stories.show', $story->id) }}">Show</a>
+                    <a href="{{ route('stories.edit', $story->id) }}">Edit</a>
+                    <form action="{{ route('stories.destroy', $story->id) }}" method="POST" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            @endforeach
+            @else
+            <tr>
+                <td colspan="5">No stories found.</td>
+            </tr>
+            @endif
+        </tbody>
+    </table>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('filterForm');
+        const searchInput = document.getElementById('search');
+        const imageSelect = document.getElementById('has_image');
+        const tableBody = document.getElementById('storiesTableBody');
+
+        function filterStories() {
+            const formData = new FormData(form);
+            const params = new URLSearchParams(formData);
+
+            fetch('{{ route("stories.index") }}?' + params.toString(), {
+                method: 'GET',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    updateTable(data.stories);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function updateTable(stories) {
+            tableBody.innerHTML = '';
+
+            if (stories.length > 0) {
+                stories.forEach(story => {
+                    const row = `
+                    <tr>
+                        <td>${story.id}</td>
+                        <td>${story.title}</td>
+                        <td>${story.description}</td>
+                        <td>
+                            ${story.image ? `<img src="/storage/${story.image}" alt="Story Image" width="80">` : ''}
+                        </td>
+                        <td>
+                            <a href="/stories/${story.id}">Show</a>
+                            <a href="/stories/${story.id}/edit">Edit</a>
+                            <form action="/stories/${story.id}" method="POST" style="display:inline;">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <button type="submit" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                `;
+                    tableBody.innerHTML += row;
+                });
+            } else {
+                tableBody.innerHTML = '<tr><td colspan="5">No stories found.</td></tr>';
+            }
+        }
+
+        // Filter on form submit
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            filterStories();
+        });
+
+        // Filter on input change (real-time search)
+        searchInput.addEventListener('input', filterStories);
+        imageSelect.addEventListener('change', filterStories);
+    });
+</script>
+```
+- Story Controller Example
+```php
+
+class StoryController extends Controller
+{
+  public function index(Request $request)
+  {
+      $stories = Story::when($request->filled('search'), function ($storyQuery) use ($request) {
+              $search = $request->input('search');
+              $storyQuery->where(function($subQuery) use ($search) {
+                  $subQuery->where('title', 'like', "%$search%")
+                           ->orWhere('description', 'like', "%$search%");
+              });
+          })
+          ->when($request->filled('has_image'), function ($storyQuery) use ($request) {
+              if ($request->input('has_image') === 'with') {
+                  $storyQuery->whereNotNull('image')->where('image', '!=', '');
+              } elseif ($request->input('has_image') === 'without') {
+                  $storyQuery->where(function($subQuery) {
+                      $subQuery->whereNull('image')->orWhere('image', '');
+                  });
+              }
+          })
+          ->get();
+
+      if ($request->ajax()) {
+          return response()->json([
+              'stories' => $stories,
+              'count' => $stories->count()
+          ]);
+      }
+
+      return view('stories.index', compact('stories'));
+  }
+
+  public function create()
+  {
+      return view('stories.create');
+  }
+
+  public function store(Request $request)
+  {
+      $data = $request->validate([
+          'title' => 'required',
+          'description' => 'required',
+          'image' => 'nullable|image'
+      ], [
+          'title.required' => 'The title field is required.',
+          'description.required' => 'The description field is required.',
+          'image.image' => 'The uploaded file must be an image.'
+      ]);
+      if ($request->hasFile('image')) {
+          $data['image'] = $request->file('image')->store('uploads', 'public');
+      }
+      Story::create($data);
+      return redirect()->route('stories.index');
+  }
+
+  public function edit(Story $story)
+  {
+      return view('stories.edit', compact('story'));
+  }
+
+  public function update(Request $request, Story $story)
+  {
+      $data = $request->validate([
+          'title' => 'required',
+          'description' => 'required',
+           'image' => 'nullable|image'
+      ], [
+          'title.required' => 'The title field is required.',
+          'description.required' => 'The description field is required.',
+          'image.image' => 'The uploaded file must be an image.'
+      ]);
+
+      if ($request->hasFile('image')) {
+          $data['image'] = $request->file('image')->store('uploads', 'public');
+      }
+      $story->update($data);
+      return redirect()->route('stories.index');
+  }
+
+  public function destroy(Story $story)
+  {
+      $story->delete();
+      return back();
+  }
+}
+```
+
+
 - ✅ Final Checklist Before Testing
 
 * [x] Migrations created and migrated
