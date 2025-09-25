@@ -23,6 +23,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 
     // Study Tracker CRUD Routes
+    // ---------------------------------------------------- ::
     Volt::route('studies', 'studies.index')->name('studies.index');
     Volt::route('studies/create', 'studies.create')->name('studies.create');
     Volt::route('studies/{study}/edit', 'studies.edit')->name('studies.edit');

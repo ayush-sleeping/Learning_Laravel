@@ -188,7 +188,8 @@ Laravel follows **MVC**, which separates the application into three core layers:
 | 76  | [Middleware and Global Middleware](#Middleware-and-Global-Middleware)                                     |
 | 77  | [Laravel Observer](#Laravel-Observer)                                                                     |
 | 78  | [API Resources](#API-Resources)                                                                           |
-| 79  | [Dependency Injection](#Dependency-Injection)                                                               |
+| 79  | [Dependency Injection](#Dependency-Injection)                                                             |
+| 80  | [Core Php vs CakePhp vs Laravel vs Laravel 12 Livewire Volt vs Laravel 12 Reactjs](#Core-PHP-vs-CakePHP-vs-Laravel-vs-Laravel-12-Livewire-Volt-vs-Laravel-12-Reactjs)                                                              |
 
 
 
@@ -1987,10 +1988,11 @@ Route::resource('articles', ArticleController::class);
 ```
 
 
+<details>
+<summary>CRUD Example With Filters (Index Page):: </summary>
 
-With Filters ::
 - Story Index File with Filter Example :
-```
+```php
 <section>
     <h1>Stories</h1>
     <a href="{{ route('stories.create') }}">
@@ -2050,7 +2052,6 @@ With Filters ::
         </tbody>
     </table>
 </section>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('filterForm');
@@ -2119,7 +2120,10 @@ With Filters ::
     });
 </script>
 ```
-- Story Controller Example
+</details>
+
+<details><summary>CRUD Example With Filters (Controller Page):: </summary>
+
 ```php
 
 class StoryController extends Controller
@@ -2208,7 +2212,7 @@ class StoryController extends Controller
   }
 }
 ```
-
+</details>
 
 - ✅ Final Checklist Before Testing
 
@@ -7448,3 +7452,4049 @@ Laravel will automatically inject NotificationService when it creates UserContro
 > Laravel makes Dependency Injection seamless using its Service Container, promoting modern and testable PHP development practices.
 
   **[⬆ Back to Top](#Important-Concepts)**
+
+
+80. ### Core Php vs CakePhp vs Laravel vs Laravel 12 Livewire Volt vs Laravel 12 Reactjs
+
+- Lets first understand how can we make CRUD operations in each of these technologies : :
+
+
+
+<!-- --------------------------------------- :: -->
+<!-- --------------------------------------- :: -->
+#### Core Php
+
+<details>
+<summary>db.php</summary>
+
+```php
+<?php
+// Database configuration
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'corephp_db';
+
+// Create connection
+$conn = new mysqli($host, $username, $password);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Create database if it doesn't exist
+$conn->query("CREATE DATABASE IF NOT EXISTS $database");
+$conn->select_db($database);
+
+// Create users table if it doesn't exist
+$create_table = "CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
+// Check if table creation was successful
+if (!$conn->query($create_table)) {
+    echo "Error creating table: " . $conn->error;
+}
+?>
+```
+</details>
+
+<details>
+<summary>index.php</summary>
+
+```php
+<?php
+// Include database connection
+include 'db.php';
+
+// Handle DELETE operation via POST
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete_id'])) {
+    $id = $_POST['delete_id'];
+    $sql = "DELETE FROM users WHERE id=$id";
+    if ($conn->query($sql)) {
+        header("Location: index.php?message=Record deleted successfully");
+        exit();
+    } else {
+        $error = "Error deleting record: " . $conn->error;
+    }
+}
+
+// READ operation - fetch all users
+$users = $conn->query("SELECT * FROM users ORDER BY id DESC");
+
+// Display success message
+$message = '';
+if (isset($_GET['message'])) {
+    $message = $_GET['message'];
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PHP CRUD - Home</title>
+</head>
+<body>
+    <h1>User Management System</h1>
+
+    <?php if ($message): ?>
+        <p style="color: green;"><?php echo $message; ?></p>
+    <?php endif; ?>
+
+    <?php if (isset($error)): ?>
+        <p style="color: red;"><?php echo $error; ?></p>
+    <?php endif; ?>
+
+    <p>
+        <a href="create.php">
+            <button>Add New User</button>
+        </a>
+    </p>
+
+    <hr>
+
+    <!-- READ - DISPLAY USERS -->
+    <h2>All Users</h2>
+    <?php if ($users->num_rows > 0): ?>
+        <table border="1">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+            <?php while ($row = $users->fetch_assoc()): ?>
+                <tr>
+                    <td><?php echo $row['id']; ?></td>
+                    <td><?php echo $row['name']; ?></td>
+                    <td><?php echo $row['email']; ?></td>
+                    <td><?php echo $row['phone']; ?></td>
+                    <td><?php echo $row['created_at']; ?></td>
+                    <td>
+                        <a href="edit.php?id=<?php echo $row['id']; ?>">
+                            <button>Edit</button>
+                        </a>
+
+                        <form method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                            <input type="hidden" name="delete_id" value="<?php echo $row['id']; ?>">
+                            <button type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <?php endwhile; ?>
+        </table>
+    <?php else: ?>
+        <p>No users found. <a href="create.php">Add some users</a></p>
+    <?php endif; ?>
+
+</body>
+</html>
+
+```
+
+</details>
+
+<details>
+<summary>create.php</summary>
+
+```php
+<?php
+include 'db.php';
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+
+    // Basic validation
+    if (!empty($name) && !empty($email)) {
+        $sql = "INSERT INTO users (name, email, phone) VALUES ('$name', '$email', '$phone')";
+
+        if ($conn->query($sql)) {
+            header("Location: index.php?message=User created successfully");
+            exit();
+        } else {
+            $error = "Error: " . $conn->error;
+        }
+    } else {
+        $error = "Name and Email are required fields";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create New User</title>
+</head>
+<body>
+    <h1>Add New User</h1>
+
+    <?php if (isset($error)): ?>
+        <p style="color: red;"><?php echo $error; ?></p>
+    <?php endif; ?>
+
+    <form method="POST">
+        <p>
+            <label>Name:</label><br>
+            <input type="text" name="name" value="<?php echo isset($_POST['name']) ? $_POST['name'] : ''; ?>" required>
+        </p>
+
+        <p>
+            <label>Email:</label><br>
+            <input type="email" name="email" value="<?php echo isset($_POST['email']) ? $_POST['email'] : ''; ?>" required>
+        </p>
+
+        <p>
+            <label>Phone:</label><br>
+            <input type="text" name="phone" value="<?php echo isset($_POST['phone']) ? $_POST['phone'] : ''; ?>">
+        </p>
+
+        <p>
+            <button type="submit">Create User</button>
+            <a href="index.php">
+                <button type="button">Cancel</button>
+            </a>
+        </p>
+    </form>
+
+</body>
+</html>
+
+```
+</details>
+
+<details>
+<summary>edit.php</summary>
+
+```php
+<?php
+include 'db.php';
+
+// Get user ID from URL
+if (!isset($_GET['id']) || empty($_GET['id'])) {
+    header("Location: index.php?message=Invalid user ID");
+    exit();
+}
+
+$id = $_GET['id'];
+
+// Fetch user data
+$result = $conn->query("SELECT * FROM users WHERE id = $id");
+if ($result->num_rows == 0) {
+    header("Location: index.php?message=User not found");
+    exit();
+}
+
+$user = $result->fetch_assoc();
+
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+
+    // Basic validation
+    if (!empty($name) && !empty($email)) {
+        $sql = "UPDATE users SET name='$name', email='$email', phone='$phone' WHERE id=$id";
+
+        if ($conn->query($sql)) {
+            header("Location: index.php?message=User updated successfully");
+            exit();
+        } else {
+            $error = "Error: " . $conn->error;
+        }
+    } else {
+        $error = "Name and Email are required fields";
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit User</title>
+</head>
+<body>
+    <h1>Edit User</h1>
+
+    <?php if (isset($error)): ?>
+        <p style="color: red;"><?php echo $error; ?></p>
+    <?php endif; ?>
+
+    <form method="POST">
+        <p>
+            <label>Name:</label><br>
+            <input type="text" name="name" value="<?php echo isset($_POST['name']) ? $_POST['name'] : $user['name']; ?>" required>
+        </p>
+
+        <p>
+            <label>Email:</label><br>
+            <input type="email" name="email" value="<?php echo isset($_POST['email']) ? $_POST['email'] : $user['email']; ?>" required>
+        </p>
+
+        <p>
+            <label>Phone:</label><br>
+            <input type="text" name="phone" value="<?php echo isset($_POST['phone']) ? $_POST['phone'] : $user['phone']; ?>">
+        </p>
+
+        <p>
+            <button type="submit">Update User</button>
+            <a href="index.php">
+                <button type="button">Cancel</button>
+            </a>
+        </p>
+    </form>
+
+</body>
+</html>
+
+```
+</details>
+
+
+
+<!-- --------------------------------------- :: -->
+<!-- --------------------------------------- :: -->
+#### CakePhp
+
+<details>
+<summary>Migration</summary>
+
+```text
+├── config/
+│   ├── Migrations/
+│   │   └── 20230101000000_CreateUsers.php # Users table migration
+```
+
+```php
+<?php
+declare(strict_types=1);
+use Migrations\BaseMigration;
+
+// Migration to create the 'users' table with required columns and unique email index
+class CreateUsers extends BaseMigration
+{
+    public function change(): void
+    {
+        // Create 'users' table
+        $table = $this->table('users');
+
+        // Add 'name' column (string, required)
+        $table->addColumn('name', 'string', [
+            'default' => null,
+            'limit' => 255,
+            'null' => false,
+        ]);
+
+        // Add 'email' column (string, required)
+        $table->addColumn('email', 'string', [
+            'default' => null,
+            'limit' => 255,
+            'null' => false,
+        ]);
+
+        // Add 'password' column (string, required, hashed password)
+        $table->addColumn('password', 'string', [
+            'default' => null,
+            'limit' => 255,
+            'null' => false,
+        ]);
+
+        // Add 'created' timestamp column (required)
+        $table->addColumn('created', 'datetime', [
+            'default' => null,
+            'null' => false,
+        ]);
+
+        // Add 'modified' timestamp column (required)
+        $table->addColumn('modified', 'datetime', [
+            'default' => null,
+            'null' => false,
+        ]);
+
+        // Add unique index on 'email' column
+        $table->addIndex([
+            'email',
+        ], [
+            'name' => 'UNIQUE_EMAIL',
+            'unique' => true,
+        ]);
+
+        // Create the table in the database
+        $table->create();
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>Database Configuration</summary>
+
+```text
+├── config/
+│   ├── app_local.php                 # Database configuration
+```
+
+```php
+<?php
+
+use function Cake\Core\env;
+
+/*
+ * Local configuration file to provide any overrides to your app.php configuration.
+ * Copy and save this file as app_local.php and make changes as required.
+ * Note: It is not recommended to commit files with credentials such as app_local.php
+ * into source code version control.
+ */
+return [
+    /*
+     * Debug Level:
+     * Production Mode:
+     * false: No error messages, errors, or warnings shown.
+     * Development Mode:
+     * true: Errors and warnings shown.
+     */
+    'debug' => filter_var(env('DEBUG', true), FILTER_VALIDATE_BOOLEAN),
+
+    /*
+     * Security and encryption configuration
+     * - salt - A random string used in security hashing methods.
+     *   The salt value is also used as the encryption key.
+     *   You should treat it as extremely sensitive data.
+     */
+    'Security' => [
+        'salt' => env('SECURITY_SALT', '09e0fb9e71281e51c904fece824daa17a17e9fb932c9138c40437b594f90b07b'),
+    ],
+
+    /*
+     * Connection information used by the ORM to connect
+     * to your application's datastores.
+     * See app.php for more configuration options.
+     */
+    'Datasources' => [
+        'default' => [
+            'className' => 'Cake\Database\Connection',
+            'driver' => 'Cake\Database\Driver\Mysql',
+            'persistent' => false,
+            'host' => '127.0.0.1',
+            /*
+             * CakePHP will use the default DB port based on the driver selected
+             * MySQL on MAMP uses port 8889, XAMPP uses port 3306
+             */
+            'port' => 3306,
+
+            'username' => 'root',
+            'password' => '',
+
+            'database' => 'cakephp_lab',
+            'encoding' => 'utf8mb4',
+            'timezone' => 'UTC',
+            'flags' => [],
+            'cacheMetadata' => true,
+            /*
+             * If not using the default 'public' schema with the PostgreSQL driver
+             * set it here.
+             */
+            //'schema' => 'myapp',
+
+            /*
+             * You can use a DSN string to set the entire configuration
+             */
+            'url' => env('DATABASE_URL', null),
+        ],
+
+        /*
+         * The test connection is used during the test suite.
+         */
+        'test' => [
+            'className' => 'Cake\Database\Connection',
+            'driver' => 'Cake\Database\Driver\Mysql',
+            'persistent' => false,
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'username' => 'root',
+            'password' => '',
+            'database' => 'cakephp_lab_test',
+            'encoding' => 'utf8mb4',
+            'timezone' => 'UTC',
+            'flags' => [],
+            'cacheMetadata' => true,
+            'url' => env('DATABASE_TEST_URL', null),
+        ],
+    ],
+
+    /*
+     * Email configuration.
+     * Host and credential configuration in case you are using SmtpTransport
+     * See app.php for more configuration options.
+     */
+    'EmailTransport' => [
+        'default' => [
+            'host' => 'localhost',
+            'port' => 25,
+            'username' => null,
+            'password' => null,
+            'client' => null,
+            'url' => env('EMAIL_TRANSPORT_DEFAULT_URL', null),
+        ],
+    ],
+];
+
+```
+
+</details>
+
+<details>
+<summary>Routes</summary>
+
+```text
+├── config/
+│   ├── Migrations/
+│   └── routes.php                    # URL routing definitions
+```
+
+```php
+<?php
+use Cake\Routing\Route\DashedRoute;
+use Cake\Routing\RouteBuilder;
+
+return function (RouteBuilder $routes): void {
+
+    $routes->setRouteClass(DashedRoute::class);
+    $routes->scope('/', function (RouteBuilder $builder): void {
+        $builder->connect('/', ['controller' => 'Pages', 'action' => 'display', 'home']);
+
+        /* Authentication routes :: */
+        $builder->connect('/signup', ['controller' => 'Auth', 'action' => 'signup']);
+        $builder->connect('/login', ['controller' => 'Auth', 'action' => 'login']);
+        $builder->connect('/logout', ['controller' => 'Auth', 'action' => 'logout']);
+        /* Dashboard routes :: */
+        $builder->connect('/dashboard', ['controller' => 'Dashboard', 'action' => 'index']);
+
+        /* Users CRUD routes :: */
+        // ------------------------------------------------ ::
+        // Let CakePHP handle default routing automatically
+        // This will create routes like: /users, /users/add, /users/edit/1, /users/view/1, /users/delete/1
+
+        /* ...and connect the rest of 'Pages' controller's URLs :: */
+        $builder->connect('/pages/*', 'Pages::display');
+        $builder->fallbacks();
+    });
+};
+
+```
+
+</details>
+
+
+<details>
+<summary>Models - Entity</summary>
+
+```text
+├── src/
+│   └── Model/
+│       ├── Entity/
+│       │   └── User.php              # User entity with password hashing
+```
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Model\Entity;
+use Cake\Utility\Security;
+use Cake\ORM\Entity;
+
+/**
+ * User Entity
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property \Cake\I18n\DateTime $created
+ * @property \Cake\I18n\DateTime $modified
+ */
+class User extends Entity
+{
+    // Fields that can be mass assigned
+    protected array $_accessible = [
+        'name' => true,
+        'email' => true,
+        'password' => true,
+        'confirm_password' => true,
+        'created' => true,
+        'modified' => true,
+    ];
+
+    // Fields hidden from JSON or array output
+    protected array $_hidden = [
+        'password',
+    ];
+
+    // Hash password before saving to database
+    protected function _setPassword(string $password): ?string
+    {
+        if (strlen($password) > 0) {
+            return password_hash($password, PASSWORD_DEFAULT);
+        }
+        return null;
+    }
+
+    /**
+     * Check if given password matches the stored hash
+     * @param string $password Plain text password
+     * @return bool True if match, false otherwise
+    */
+    public function verifyPassword(string $password): bool
+    {
+        return password_verify($password, $this->password);
+    }
+}
+
+```
+
+</details>
+
+
+<details>
+<summary>Models - Table</summary>
+
+```text
+├── src/
+│   └── Model/
+│       └── Table/
+│           └── UsersTable.php        # User database operations &
+```
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Model\Table;
+
+use Cake\ORM\Query\SelectQuery;
+use Cake\ORM\RulesChecker;
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
+
+// UsersTable handles all database logic for the users table
+class UsersTable extends Table
+{
+    // Set up table config and behaviors
+    public function initialize(array $config): void
+    {
+        parent::initialize($config);
+        $this->setTable('users'); // Table name in DB
+        $this->setDisplayField('name'); // Field to show in dropdowns/lists
+        $this->setPrimaryKey('id'); // Primary key column
+        $this->addBehavior('Timestamp'); // Auto-manage created/modified fields
+    }
+
+    // Define validation rules for user fields
+    public function validationDefault(Validator $validator): Validator
+    {
+        // Name: required, not empty, max 255 chars
+        $validator
+            ->scalar('name')
+            ->maxLength('name', 255)
+            ->requirePresence('name', 'create')
+            ->notEmptyString('name');
+
+        // Email: required, must be valid, unique
+        $validator
+            ->email('email')
+            ->requirePresence('email', 'create')
+            ->notEmptyString('email')
+            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
+
+        // Password: required, not empty, min 6 chars
+        $validator
+            ->scalar('password')
+            ->maxLength('password', 255)
+            ->requirePresence('password', 'create')
+            ->notEmptyString('password')
+            ->minLength('password', 6, 'Password must be at least 6 characters long');
+
+        // Confirm password: must match password
+        $validator
+            ->scalar('confirm_password')
+            ->requirePresence('confirm_password', 'create')
+            ->notEmptyString('confirm_password')
+            ->add('confirm_password', 'compareWith', [
+                'rule' => ['compareWith', 'password'],
+                'message' => 'Password confirmation does not match password'
+            ]);
+
+        return $validator;
+    }
+
+    // Add application integrity rules
+    public function buildRules(RulesChecker $rules): RulesChecker
+    {
+        // Email must be unique in users table
+        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
+        return $rules;
+    }
+}
+
+```
+
+</details>
+
+<details>
+<summary>Controller</summary>
+
+```text
+├── src/
+│   ├── Controller/
+│   │   ├── AppController.php         # Base controller
+│   │   ├── PagesController.php       # Home page controller
+│   │   ├── AuthController.php        # Signup/Login/Logout controller
+│   │   ├── DashboardController.php   # Protected dashboard controller
+│   │   └── UsersController.php       # Users CRUD operations controller
+```
+
+```php
+
+```
+
+<details>
+<summary>AppController.php</summary>
+
+```php
+<?php
+declare(strict_types=1);
+namespace App\Controller;
+use Cake\Controller\Controller;
+
+class AppController extends Controller
+{
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->loadComponent('Flash');
+        /*
+         * Enable the following component for recommended CakePHP form protection settings.
+         * see https://book.cakephp.org/5/en/controllers/components/form-protection.html
+         */
+        //$this->loadComponent('FormProtection');
+    }
+}
+
+```
+
+</details>
+
+<details>
+<summary>PagesController.php</summary>
+
+```php
+<?php
+declare(strict_types=1);
+namespace App\Controller;
+
+use Cake\Core\Configure;
+use Cake\Http\Exception\ForbiddenException;
+use Cake\Http\Exception\NotFoundException;
+use Cake\Http\Response;
+use Cake\View\Exception\MissingTemplateException;
+
+// Handles static pages (like home, about, etc.)
+class PagesController extends AppController
+{
+    // Renders a static page based on the URL path
+    public function display(string ...$path): ?Response
+    {
+        // If no path is given, redirect to home
+        if (!$path) {
+            return $this->redirect('/');
+        }
+        // Prevent directory traversal (security)
+        if (in_array('..', $path, true) || in_array('.', $path, true)) {
+            throw new ForbiddenException();
+        }
+
+        // Set page and subpage variables for the view
+        $page = $subpage = null;
+        if (!empty($path[0])) {
+            $page = $path[0];
+        }
+        if (!empty($path[1])) {
+            $subpage = $path[1];
+        }
+        $this->set(compact('page', 'subpage'));
+
+        // Try to render the requested template
+        try {
+            return $this->render(implode('/', $path));
+        } catch (MissingTemplateException $exception) {
+            // Show error if template not found
+            if (Configure::read('debug')) {
+                throw $exception;
+            }
+            throw new NotFoundException();
+        }
+    }
+}
+
+```
+
+</details>
+
+<details>
+<summary>AuthController.php</summary>
+
+```php
+<?php
+namespace App\Controller;
+use App\Controller\AppController;
+
+class AuthController extends AppController
+{
+    public function signup()
+    {
+        $usersTable = $this->fetchTable('Users');
+        $user = $usersTable->newEmptyEntity();
+
+        // GET request - Show signup form
+        if ($this->request->is('get')) {
+            $this->set(compact('user'));
+            return;
+        }
+
+        // POST request - Process signup form
+        if ($this->request->is('post')) {
+            // Patch entity with form data
+            $user = $usersTable->patchEntity($user, $this->request->getData());
+
+            // Attempt to save the user
+            if ($usersTable->save($user)) {
+                // Successfully created user
+                $this->Flash->success('Account created successfully! Please login to continue.');
+
+                // Redirect to login page
+                return $this->redirect(['action' => 'login']);
+            } else {
+                // Validation errors occurred
+                $this->Flash->error('There were some problems with your registration. Please check the form and try again.');
+
+                // Set the user entity with errors for the view
+                $this->set(compact('user'));
+            }
+        }
+    }
+
+    public function login()
+    {
+        // GET request - Show login form
+        if ($this->request->is('get')) {
+            // Just render the login template
+            return;
+        }
+
+        // POST request - Process login form
+        if ($this->request->is('post')) {
+            $email = $this->request->getData('email');
+            $password = $this->request->getData('password');
+
+            // Basic validation
+            if (empty($email) || empty($password)) {
+                $this->Flash->error('Please enter both email and password.');
+                return;
+            }
+
+            // Find user by email
+            $usersTable = $this->fetchTable('Users');
+            $user = $usersTable->find()
+                ->where(['email' => $email])
+                ->first();
+
+            // Check if user exists and password is correct
+            if ($user && $user->verifyPassword($password)) {
+                // Login successful - create session
+                $this->Flash->success('Welcome back, ' . h($user->name) . '!');
+
+                // Create user session
+                $this->request->getSession()->write('Auth.User', [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email
+                ]);
+
+                // Redirect to dashboard
+                return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
+            } else {
+                // Login failed
+                $this->Flash->error('Invalid email or password. Please try again.');
+            }
+        }
+    }
+
+    public function logout()
+    {
+        // Destroy user session
+        $this->request->getSession()->delete('Auth.User');
+        // Clear all session data for security
+        $this->request->getSession()->destroy();
+        $this->Flash->success('You have been logged out successfully.');
+        return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
+    }
+
+}
+
+```
+
+</details>
+
+<details>
+<summary>DashboardController.php</summary>
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Controller;
+
+use App\Controller\AppController;
+
+class DashboardController extends AppController
+{
+    public function initialize(): void
+    {
+        parent::initialize();
+        $this->checkUserAuth();
+    }
+
+    public function index()
+    {
+        // Get current user from session
+        $currentUser = $this->request->getSession()->read('Auth.User');
+        // Pass user data to view
+        $this->set(compact('currentUser'));
+    }
+
+    /**
+     * Check if user is authenticated
+     * Redirect to login if not authenticated
+     *
+     * @return void
+     */
+    private function checkUserAuth(): void
+    {
+        if (!$this->request->getSession()->check('Auth.User')) {
+            $this->Flash->error('Please login to access the dashboard.');
+            $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+    }
+}
+
+```
+
+</details>
+
+<details>
+<summary>UsersController.php</summary>
+
+```php
+<?php
+declare(strict_types=1);
+
+namespace App\Controller;
+
+class UsersController extends AppController
+{
+    public function initialize(): void
+    {
+        parent::initialize();
+
+        // Load Flash component
+        $this->loadComponent('Flash');
+    }
+
+    public function beforeFilter(\Cake\Event\EventInterface $event)
+    {
+        parent::beforeFilter($event);
+
+        // Check if user is logged in for all actions
+        $session = $this->request->getSession();
+        if (!$session->check('Auth.User')) {
+            $this->Flash->error(__('You need to login first.'));
+            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
+        }
+
+        // Get current user data for all actions
+        $currentUser = $session->read('Auth.User');
+        $this->set('currentUser', $currentUser);
+    }
+
+    public function index()
+    {
+        $usersTable = $this->fetchTable('Users');
+        $users = $this->paginate($usersTable);
+        $this->set(compact('users'));
+    }
+
+    public function view($id = null)
+    {
+        $usersTable = $this->fetchTable('Users');
+        $user = $usersTable->get($id, [
+            'contain' => [],
+        ]);
+        $this->set(compact('user'));
+    }
+
+    public function add()
+    {
+        $usersTable = $this->fetchTable('Users');
+        $user = $usersTable->newEmptyEntity();
+        if ($this->request->is('post')) {
+            $user = $usersTable->patchEntity($user, $this->request->getData());
+            if ($usersTable->save($user)) {
+                $this->Flash->success(__('The user has been saved.'));
+
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+        }
+        $this->set(compact('user'));
+    }
+
+    public function edit($id = null)
+    {
+
+
+        // Check if ID is provided
+        if ($id === null) {
+            $this->Flash->error(__('Invalid user ID.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $usersTable = $this->fetchTable('Users');
+
+        try {
+            $user = $usersTable->get($id, [
+                'contain' => [],
+            ]);
+        } catch (\Exception $e) {
+            $this->Flash->error(__('User not found.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+            $user = $usersTable->patchEntity($user, $this->request->getData());
+            if ($usersTable->save($user)) {
+                $this->Flash->success(__('The user has been saved.'));
+                return $this->redirect(['action' => 'index']);
+            }
+            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+        }
+        $this->set(compact('user'));
+    }
+
+    public function delete($id = null)
+    {
+        $this->request->allowMethod(['post', 'delete']);
+
+        // Check if ID is provided
+        if ($id === null) {
+            $this->Flash->error(__('Invalid user ID.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        $usersTable = $this->fetchTable('Users');
+
+        try {
+            $user = $usersTable->get($id);
+        } catch (\Exception $e) {
+            $this->Flash->error(__('User not found.'));
+            return $this->redirect(['action' => 'index']);
+        }
+
+        if ($usersTable->delete($user)) {
+            $this->Flash->success(__('The user has been deleted.'));
+        } else {
+            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
+}
+
+```
+
+</details>
+
+
+</details>
+
+
+<details>
+<summary>Views</summary>
+
+```text
+├── templates/
+│   ├── layout/
+│   │   └── default.php               # Main layout template
+│   ├── Pages/
+│   │   └── home.php                  # Frontend homepage
+│   ├── Auth/
+│   │   ├── signup.php                # User registration form
+│   │   └── login.php                 # User login form
+│   ├── Dashboard/
+│   │   └── index.php                 # Dashboard with sidebar navigation
+│   └── Users/
+│       ├── index.php                 # Users listing table
+│       ├── add.php                   # Add new user form
+│       ├── edit.php                  # Edit user form
+│       └── view.php                  # View user details
+```
+
+<details>
+<summary>layout\default.php</summary>
+
+```php
+<?php
+/**
+ * CakePHP Learning Lab - Default Layout
+ * This layout will be used across all pages in the application.
+ * Contains: Header navigation, common CSS, HTML structure
+ */
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <?= $this->Html->charset() ?>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><?= $this->fetch('title') ?></title>
+    <?= $this->Html->meta('icon') ?>
+    <?= $this->Html->css('style') ?>
+    <meta name="description" content="CakePHP Learning Lab - Learning CakePHP through practical implementation">
+    <?= $this->fetch('meta') ?>
+    <?= $this->fetch('css') ?>
+    <?= $this->fetch('script') ?>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <!-- Left side: Project name -->
+            <a href="<?= $this->Url->build('/') ?>" class="logo">
+                CakePHP Lab
+            </a>
+            <!-- Right side: Login/Signup links or User menu -->
+            <ul class="nav-links">
+                <?php if ($this->request->getSession()->check('Auth.User')): ?>
+                    <?php $user = $this->request->getSession()->read('Auth.User'); ?>
+                    <li><span class="welcome-text">Welcome, <?= h($user['name']) ?>!</span></li>
+                    <li><a href="<?= $this->Url->build('/logout') ?>" class="nav-link">Logout</a></li>
+                <?php else: ?>
+                    <li><a href="<?= $this->Url->build('/login') ?>" class="nav-link">Login</a></li>
+                    <li><a href="<?= $this->Url->build('/signup') ?>" class="btn btn-primary">Sign Up</a></li>
+                <?php endif; ?>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <?= $this->Flash->render() ?>
+    <!-- Page Content -->
+    <?= $this->fetch('content') ?>
+
+</body>
+</html>
+
+```
+
+</details>
+
+<details>
+<summary>pages\home.php</summary>
+
+```php
+<?php
+/**
+ * Home Page - CakePHP Learning Lab
+ * Common elements (header, CSS, HTML structure) are in the default layout.
+*/
+// Set page title
+$this->assign('title', 'Home - CakePHP Lab');
+?>
+
+<!-- Features Section -->
+<section class="features">
+    <div class="container">
+        <h2 style="text-align: center; color: #2c3e50; margin-bottom: 1rem;">What I'm Learning</h2>
+        <p style="text-align: center; color: #666; max-width: 600px; margin: 0 auto;">
+            This project helps me understand CakePHP concepts through hands-on practice with real features.
+        </p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Authentication System</h3>
+                <p>Complete user registration, login, logout, and session management with CakePHP's Authentication plugin.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>CRUD Operations</h3>
+                <p>Full Create, Read, Update, Delete functionality with form handling, validation, and database operations.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>MVC Architecture</h3>
+                <p>Understand CakePHP's Model-View-Controller pattern and convention over configuration approach.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>ORM & Database</h3>
+                <p>Learn CakePHP's powerful ORM, migrations, associations, and advanced database operations.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Templating System</h3>
+                <p>Master CakePHP's templating engine, helpers, elements, and creating dynamic user interfaces.</p>
+            </div>
+
+            <div class="feature-card">
+                <h3>Modern Development</h3>
+                <p>Best practices, security, testing, and deployment strategies for professional CakePHP applications.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technology Stack Section -->
+<section class="tech-stack">
+    <div class="container">
+        <h2 style="color: #2c3e50; margin-bottom: 1rem;">Tech Stack I'm Using</h2>
+        <p style="color: #666; margin-bottom: 2rem;">Technologies I'm practicing with in this project</p>
+
+        <div class="tech-grid">
+            <div class="tech-item">CakePHP 5.x</div>
+            <div class="tech-item">PHP 8.1+</div>
+            <div class="tech-item">MySQL</div>
+            <div class="tech-item">HTML5</div>
+            <div class="tech-item">CSS3</div>
+            <div class="tech-item">JavaScript</div>
+        </div>
+    </div>
+</section>
+
+```
+
+</details>
+
+<details>
+<summary>auth\signup.php</summary>
+
+```php
+<?php
+$this->assign('title', 'Sign Up - CakePHP Learning Lab');
+?>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h3>Create Account</h3>
+
+        <?= $this->Form->create($user, [
+            'type' => 'post',
+            'class' => 'auth-form'
+        ]) ?>
+
+        <div class="form-group">
+            <?= $this->Form->control('name', [
+                'type' => 'text',
+                'label' => 'Full Name',
+                'placeholder' => 'Enter your full name',
+                'required' => true,
+                'class' => 'form-control'
+            ]) ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->Form->control('email', [
+                'type' => 'email',
+                'label' => 'Email Address',
+                'placeholder' => 'Enter your email',
+                'required' => true,
+                'class' => 'form-control'
+            ]) ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->Form->control('password', [
+                'type' => 'password',
+                'label' => 'Password',
+                'placeholder' => 'Create a password',
+                'required' => true,
+                'class' => 'form-control'
+            ]) ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->Form->control('confirm_password', [
+                'type' => 'password',
+                'label' => 'Confirm Password',
+                'placeholder' => 'Confirm your password',
+                'required' => true,
+                'class' => 'form-control'
+            ]) ?>
+        </div>
+
+        <div class="form-actions">
+            <?= $this->Form->button('Create Account', [
+                'type' => 'submit',
+                'class' => 'btn btn-primary btn-full'
+            ]) ?>
+        </div>
+
+        <?= $this->Form->end() ?>
+
+        <div class="auth-links">
+            <p>Already have an account?
+                <a href="<?= $this->Url->build('/login') ?>">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+```
+
+</details>
+
+<details>
+<summary>auth\login.php</summary>
+
+```php
+<?php
+/**
+ * @var \App\View\AppView $this
+ */
+?>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Login</h2>
+        <p>Enter your credentials to access your account</p>
+
+        <?= $this->Form->create(null, [
+            'type' => 'post',
+            'class' => 'auth-form'
+        ]) ?>
+
+        <div class="form-group">
+            <?= $this->Form->control('email', [
+                'type' => 'email',
+                'label' => 'Email Address',
+                'required' => true,
+                'placeholder' => 'Enter your email',
+                'class' => 'form-control'
+            ]) ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->Form->control('password', [
+                'type' => 'password',
+                'label' => 'Password',
+                'required' => true,
+                'placeholder' => 'Enter your password',
+                'class' => 'form-control'
+            ]) ?>
+        </div>
+
+        <div class="form-group">
+            <label class="checkbox-container">
+                <?= $this->Form->checkbox('remember_me', ['hiddenField' => false]) ?>
+                <span class="checkmark"></span>
+                Remember me
+            </label>
+        </div>
+
+        <div class="form-actions">
+            <?= $this->Form->button('Login', [
+                'type' => 'submit',
+                'class' => 'btn btn-primary btn-block'
+            ]) ?>
+        </div>
+
+        <?= $this->Form->end() ?>
+
+        <div class="auth-links">
+            <p>Don't have an account? <?= $this->Html->link('Sign up here', '/signup') ?></p>
+            <p><?= $this->Html->link('Forgot your password?', '#') ?></p>
+        </div>
+    </div>
+</div>
+
+
+```
+
+</details>
+
+<details>
+<summary>Dashboard\index.php</summary>
+
+```php
+<?php
+$this->assign('title', 'Dashboard - CakePHP Learning Lab');
+?>
+
+<div class="dashboard-layout">
+    <!-- Left Sidebar - 10% width -->
+    <div class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link active">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link">
+                        Users
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Right Content Area - 90% width -->
+    <div class="dashboard-content">
+        <!-- Dashboard Section -->
+        <div class="dashboard-content-main">
+            <div class="dashboard-header">
+                <h1>Welcome to Your Dashboard</h1>
+                <p>Hello, <strong><?= h($currentUser['name']) ?></strong>! You're successfully logged in.</p>
+            </div>
+
+            <div class="dashboard-grid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- No JavaScript needed since Users link navigates to separate controller -->
+
+
+```
+
+</details>
+
+<details>
+<summary>Users\index.php</summary>
+
+```php
+
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var iterable<\App\Model\Entity\User> $users
+ * @var \App\Model\Entity\User $currentUser
+ */
+$this->assign('title', 'Users Management - CakePHP Learning Lab');
+?>
+
+<div class="dashboard-layout">
+    <!-- Left Sidebar - 10% width -->
+    <div class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
+                        Users
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Right Content Area - 90% width -->
+    <div class="dashboard-content">
+        <div class="dashboard-content-main">
+            <div class="dashboard-header">
+                <h1>Users Management</h1>
+                <p>Manage all registered users in the system</p>
+
+            </div>
+
+            <div class="users-actions">
+                <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary">Add New User</a>
+            </div>
+
+            <?= $this->Flash->render() ?>
+
+            <div class="users-table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th><?= $this->Paginator->sort('id', 'ID') ?></th>
+                            <th><?= $this->Paginator->sort('name', 'Name') ?></th>
+                            <th><?= $this->Paginator->sort('email', 'Email') ?></th>
+                            <th><?= $this->Paginator->sort('created', 'Created') ?></th>
+                            <th class="actions">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td><?= $this->Number->format($user->id) ?></td>
+                            <td><?= h($user->name) ?></td>
+                            <td><?= h($user->email) ?></td>
+                            <td><?= h($user->created->format('Y-m-d H:i')) ?></td>
+                            <td class="actions">
+                                <div class="action-buttons">
+                                    <a href="<?= $this->Url->build(['action' => 'view', $user->id]) ?>" class="btn-outline">View</a>
+                                    <a href="<?= $this->Url->build(['action' => 'edit', $user->id]) ?>" class="btn-outline">Edit</a>
+                                    <?= $this->Form->postLink(
+                                        'Delete',
+                                        ['action' => 'delete', $user->id],
+                                        [
+                                            'confirm' => __('Are you sure you want to delete user "{0}"?', $user->name),
+                                            'class' => 'btn-outline'
+                                        ]
+                                    ) ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($this->Paginator->counter('{{pages}}') > 1): ?>
+            <div class="paginator">
+                <ul class="pagination">
+                    <?= $this->Paginator->first('<< ' . __('first')) ?>
+                    <?= $this->Paginator->prev('< ' . __('previous')) ?>
+                    <?= $this->Paginator->numbers() ?>
+                    <?= $this->Paginator->next(__('next') . ' >') ?>
+                    <?= $this->Paginator->last(__('last') . ' >>') ?>
+                </ul>
+                <p class="pagination-info">
+                    <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?>
+                </p>
+            </div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+</div>
+
+```
+
+</details>
+
+<details>
+<summary>Users\add.php</summary>
+
+```php
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\User $user
+ * @var \App\Model\Entity\User $currentUser
+ */
+$this->assign('title', 'Add User - CakePHP Learning Lab');
+?>
+
+<div class="dashboard-layout">
+    <!-- Left Sidebar - 10% width -->
+    <div class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
+                        Users
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Right Content Area - 90% width -->
+    <div class="dashboard-content">
+        <div class="dashboard-content-main">
+            <div class="dashboard-header">
+                <h1>Add New User</h1>
+                <p>Create a new user account in the system</p>
+
+            </div>
+
+            <div class="users-actions">
+                <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline">Back to Users List</a>
+            </div>
+
+            <?= $this->Flash->render() ?>
+
+            <div class="form-container">
+                <div class="auth-card">
+                    <?= $this->Form->create($user) ?>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('name', [
+                            'type' => 'text',
+                            'label' => 'Full Name',
+                            'class' => 'form-control',
+                            'placeholder' => 'Enter full name',
+                            'required' => true
+                        ]) ?>
+                    </div>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('email', [
+                            'type' => 'email',
+                            'label' => 'Email Address',
+                            'class' => 'form-control',
+                            'placeholder' => 'Enter email address',
+                            'required' => true
+                        ]) ?>
+                    </div>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('password', [
+                            'type' => 'password',
+                            'label' => 'Password',
+                            'class' => 'form-control',
+                            'placeholder' => 'Enter password',
+                            'required' => true
+                        ]) ?>
+                    </div>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('confirm_password', [
+                            'type' => 'password',
+                            'label' => 'Confirm Password',
+                            'class' => 'form-control',
+                            'placeholder' => 'Confirm password',
+                            'required' => true
+                        ]) ?>
+                    </div>
+
+                    <div class="form-actions">
+                        <?= $this->Form->button('Create User', ['class' => 'btn btn-primary btn-full']) ?>
+                    </div>
+
+                    <?= $this->Form->end() ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+```
+
+</details>
+
+<details>
+<summary>Users\edit.php</summary>
+
+```php
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\User $user
+ * @var \App\Model\Entity\User $currentUser
+ */
+$this->assign('title', 'Edit User - CakePHP Learning Lab');
+?>
+
+<div class="dashboard-layout">
+    <!-- Left Sidebar - 10% width -->
+    <div class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(url: ['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
+                        Users
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Right Content Area - 90% width -->
+    <div class="dashboard-content">
+        <div class="dashboard-content-main">
+            <div class="dashboard-header">
+                <h1>Edit User: <?= h($user->name) ?></h1>
+                <p>Update user information in the system</p>
+
+            </div>
+
+            <div class="users-actions">
+                <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline">Back to Users List</a>
+                <a href="<?= $this->Url->build(['action' => 'view', $user->id]) ?>" class="btn btn-outline">View User</a>
+            </div>
+
+            <?= $this->Flash->render() ?>
+
+            <div class="form-container">
+                <div class="auth-card">
+                    <?= $this->Form->create($user) ?>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('name', [
+                            'type' => 'text',
+                            'label' => 'Full Name',
+                            'class' => 'form-control',
+                            'placeholder' => 'Enter full name',
+                            'required' => true
+                        ]) ?>
+                    </div>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('email', [
+                            'type' => 'email',
+                            'label' => 'Email Address',
+                            'class' => 'form-control',
+                            'placeholder' => 'Enter email address',
+                            'required' => true
+                        ]) ?>
+                    </div>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('password', [
+                            'type' => 'password',
+                            'label' => 'New Password (leave blank to keep current)',
+                            'class' => 'form-control',
+                            'placeholder' => 'Enter new password',
+                            'required' => false,
+                            'value' => ''
+                        ]) ?>
+                    </div>
+
+                    <div class="form-group">
+                        <?= $this->Form->control('confirm_password', [
+                            'type' => 'password',
+                            'label' => 'Confirm New Password',
+                            'class' => 'form-control',
+                            'placeholder' => 'Confirm new password',
+                            'required' => false,
+                            'value' => ''
+                        ]) ?>
+                    </div>
+
+                    <div class="form-actions">
+                        <?= $this->Form->button('Update User', ['class' => 'btn btn-primary btn-full']) ?>
+                    </div>
+
+                    <?= $this->Form->end() ?>
+
+                    <div class="form-actions" style="margin-top: 20px; text-align: center;">
+                        <?= $this->Form->postLink(
+                            'Delete User',
+                            ['action' => 'delete', $user->id],
+                            [
+                                'confirm' => __('Are you sure you want to delete user "{0}"?', $user->name),
+                                'class' => 'btn btn-outline'
+                            ]
+                        ) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+```
+
+</details>
+
+<details>
+<summary>Users\view.php</summary>
+
+```php
+
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\User $user
+ * @var \App\Model\Entity\User $currentUser
+ */
+$this->assign('title', 'View User - CakePHP Learning Lab');
+?>
+
+<div class="dashboard-layout">
+    <!-- Left Sidebar - 10% width -->
+    <div class="dashboard-sidebar">
+        <nav class="sidebar-nav">
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
+                        Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
+                        Users
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Right Content Area - 90% width -->
+    <div class="dashboard-content">
+        <div class="dashboard-content-main">
+            <div class="dashboard-header">
+                <h1>View User: <?= h($user->name) ?></h1>
+                <p>User information details</p>
+            </div>
+
+            <div class="users-actions">
+                <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline">Back to Users List</a>
+                <a href="<?= $this->Url->build(['action' => 'edit', $user->id]) ?>" class="btn btn-primary">Edit User</a>
+            </div>
+
+            <?= $this->Flash->render() ?>
+
+            <div class="users-table-container">
+                <table class="table">
+                    <tr>
+                        <th>ID</th>
+                        <td><?= $this->Number->format($user->id) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Full Name</th>
+                        <td><?= h($user->name) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Email Address</th>
+                        <td><?= h($user->email) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Created</th>
+                        <td><?= h($user->created->format('Y-m-d H:i:s')) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Modified</th>
+                        <td><?= h($user->modified->format('Y-m-d H:i:s')) ?></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="users-actions">
+                <?= $this->Form->postLink(
+                    'Delete User',
+                    ['action' => 'delete', $user->id],
+                    [
+                        'confirm' => __('Are you sure you want to delete user "{0}"?', $user->name),
+                        'class' => 'btn btn-outline'
+                    ]
+                ) ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+```
+
+</details>
+
+
+
+</details>
+
+<details>
+<summary>CSS</summary>
+
+```text
+└── webroot/
+    └── css/
+        └── style.css                 # Clean white/black styling
+```
+
+```css
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    color: black;
+    background: white;
+}
+
+/* Header */
+.navbar {
+    background: white;
+    padding: 20px 0;
+    border-bottom: 1px solid black;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+    list-style: none;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: black;
+}
+
+.nav-link:hover {
+    text-decoration: underline;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 24px;
+    text-decoration: none;
+    border: 1px solid black;
+    background: white;
+    color: black;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.btn:hover {
+    background: black;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-primary {
+    background: black;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: white;
+    color: black;
+}
+
+.btn-full {
+    width: 100%;
+}
+
+.btn-outline {
+    background: white;
+    border: 1px solid black;
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    font-size: 12px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    background: black;
+    color: white;
+    text-decoration: none;
+}
+
+/* Forms */
+.auth-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.auth-card {
+    background: white;
+    padding: 40px;
+    border: 1px solid black;
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-card h3 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: black;
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: black;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid black;
+    font-size: 16px;
+    background: white;
+    color: black;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: black;
+}
+
+.auth-links {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid black;
+}
+
+.auth-links a {
+    color: black;
+    text-decoration: none;
+}
+
+.auth-links a:hover {
+    text-decoration: underline;
+}
+
+/* Dashboard Layout */
+.dashboard-layout {
+    display: flex;
+    min-height: 80vh;
+}
+
+.dashboard-sidebar {
+    width: 10%;
+    background: white;
+    border-right: 1px solid black;
+    padding: 20px 0;
+}
+
+.sidebar-nav .nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    margin-bottom: 5px;
+}
+
+.nav-link {
+    display: block;
+    padding: 15px 20px;
+    color: black;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+    background: white;
+    color: black;
+    text-decoration: none;
+    border-left-color: black;
+}
+
+.nav-link.active {
+    background: white;
+    color: black;
+    border-left-color: black;
+}
+
+.dashboard-content {
+    width: 90%;
+    padding: 40px;
+    background: white;
+}
+
+.dashboard-header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid black;
+}
+
+.dashboard-header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.dashboard-header p {
+    font-size: 16px;
+    color: black;
+}
+
+/* Tables */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.table th,
+.table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid black;
+    color: black;
+}
+
+.table th {
+    background: white;
+    font-weight: bold;
+    border-bottom: 2px solid black;
+}
+
+.table tbody tr:hover {
+    background: white;
+}
+
+/* Users Management */
+.users-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid black;
+}
+
+.users-header h1 {
+    margin: 0;
+    color: black;
+}
+
+.users-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.users-table-container {
+    background: white;
+    border: 1px solid black;
+    margin-bottom: 2rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Pagination */
+.paginator {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+.pagination {
+    list-style: none;
+    display: inline-flex;
+    gap: 0.5rem;
+    margin: 0 0 1rem 0;
+    padding: 0;
+}
+
+.pagination li a,
+.pagination li span {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    color: black;
+    border: 1px solid black;
+}
+
+.pagination li a:hover {
+    background: black;
+    color: white;
+}
+
+.pagination li.active span {
+    background: black;
+    color: white;
+}
+
+.pagination-info {
+    color: black;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Users Table Container */
+.users-table-container {
+    background: white;
+    border: 1px solid black;
+    margin-bottom: 2rem;
+}
+
+/* Form Container */
+.form-container {
+    max-width: 600px;
+    margin: 2rem auto 0;
+}
+
+.form-actions {
+    margin-top: 30px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .dashboard-layout {
+        flex-direction: column;
+    }
+
+    .dashboard-sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid black;
+    }
+
+    .dashboard-content {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .users-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+
+```
+
+</details>
+
+
+
+
+<!-- --------------------------------------- :: -->
+<!-- --------------------------------------- :: -->
+#### Laravel
+
+<details>
+<summary>Migration</summary>
+
+```php
+<?php
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('articles', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger("tag_id")->nullable();
+            $table->string('title');
+            $table->string('slug')->unique()->nullable();
+            $table->text('content');
+            $table->string('image')->nullable();
+            $table->timestamps();
+            $table->foreign('tag_id')->references('id')->on('tags')->onDelete('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('articles');
+    }
+};
+```
+</details>
+
+<details>
+<summary>Model </summary>
+
+```php
+<?php
+
+namespace App\Models;
+use App\Models\Tag;
+use Illuminate\Database\Eloquent\Model;
+
+class Article extends Model
+{
+    protected $fillable = [
+        'tag_id',
+        'title',
+        'slug',
+        'content',
+        'image',
+    ];
+
+    public function tag()
+    {
+        return $this->belongsTo(Tag::class);
+    }
+}
+```
+</details>
+
+<details>
+<summary>Routes </summary>
+
+```php
+Route::resource('admin/articles', ArticleController::class);
+```
+</details>
+
+<details>
+<summary>Controller </summary>
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+use App\Models\Tag;
+use App\Models\Article;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class ArticleController extends Controller
+{
+    /* Display a listing of the resource. */
+    public function index()
+    {
+        $articles = Article::latest()->paginate(5);
+        $tags = Tag::all();
+        return view('Backend.Articles.index', compact('articles', 'tags'));
+    }
+
+    /* Show the form for creating a new resource. */
+    public function create()
+    {
+        $tags = Tag::all();
+        return view('Backend.Articles.create', compact('tags'));
+    }
+
+    /* Store a newly created resource in storage. */
+    public function store(Request $request)
+    {
+        //dd($request->all());
+        $request->validate([
+            'title' => 'required|string',
+            'slug' => 'nullable|string|unique:articles,slug',
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5048',
+            'tag_id' => 'required|exists:tags,id',
+        ]);
+
+        $article = new Article();
+        $article->title = $request->title;
+        $article->slug = $request->slug;
+        $article->content = $request->content;
+        $article->tag_id = $request->tag_id;
+        if ($request->hasFile('image')){
+            $image = $request->file('image');
+            $name = Str::slug($request->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+            $detainationPath = public_path('/images/articles');
+            $imagePath = $detainationPath . '/' . $name;
+            $image->move($detainationPath, $name);
+            $article->image = $name;
+        }
+        $article->save();
+
+        return redirect()->route('articles.index')->with('success', 'Article created successfully.');
+    }
+
+    /* Display the specified resource. */
+    public function show(Article $article)
+    {
+        return view('Backend.Articles.show', compact('article'));
+    }
+
+    /* Show the form for editing the specified resource. */
+    public function edit(Article $article)
+    {
+        $tags = Tag::all();
+        return view('Backend.Articles.edit', compact('article', 'tags'));
+    }
+
+    /* Update the specified resource in storage. */
+    public function update(Request $request, Article $article)
+    {
+        $request->validate([
+            'title' => 'required|string',
+            'slug' => 'nullable|string|unique:articles,slug,' . $article->id,
+            'content' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:5048',
+            'tag_id' => 'required|exists:tags,id',
+        ]);
+
+        $article->title = $request->title;
+        $article->slug = $request->slug;
+        $article->content = $request->content;
+        $article->tag_id = $request->tag_id;
+
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if ($article->image) {
+                $oldImagePath = public_path('/images/articles/' . $article->image);
+                if (file_exists($oldImagePath)) {
+                    unlink($oldImagePath);
+                }
+            }
+
+            $image = $request->file('image');
+            $name = Str::slug($request->title) . '-' . time() . '.' . $image->getClientOriginalExtension();
+            $detainationPath = public_path('/images/articles');
+            $imagePath = $detainationPath . '/' . $name;
+            $image->move($detainationPath, $name);
+            $article->image = $name;
+        }
+
+        $article->save();
+
+        return redirect()->route('articles.index')->with('success', 'Article updated successfully.');
+    }
+
+    /* Remove the specified resource from storage. */
+    public function destroy(Article $article)
+    {
+        // Delete image if exists
+        if ($article->image) {
+            $imagePath = public_path('/images/articles/' . $article->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+
+        $article->delete();
+
+        return redirect()->route('articles.index')->with('success', 'Article deleted successfully.');
+    }
+}
+
+```
+</details>
+
+<details>
+<summary>Views </summary>
+
+
+<details>
+<summary>Layout </summary>
+
+```php
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Laravel CRUD</title>
+</head>
+<body>
+    <div class="container">
+        @yield('content')
+    </div>
+</body>
+
+</html>
+
+```
+</details>
+
+
+<details>
+<summary>index.blade.php </summary>
+
+```php
+@extends('Layout.basicLayout')
+
+@section('content')
+<h3>Articles</h3>
+<a href="{{ route('articles.create') }}">Create New Article</a>
+@if($articles->count())
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Tag</th>
+            <th>Content</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($articles as $article)
+        <tr>
+            <td>{{ $article->id }}</td>
+            <td>{{ $article->title }}</td>
+            <td>{{ $article->tag->name }}</td>
+            <td>{{ $article->content }}</td>
+            <td>
+                @if($article->image)
+                <img src="{{ asset('images/articles/' . $article->image) }}" alt="Article Image"
+                    style="width:40px; height:40px; object-fit:cover; border-radius:50%;">
+                @else
+                No image
+                @endif
+            </td>
+            <td>
+                <a href="{{ route('articles.edit', $article->id) }}">Edit</a>
+                <a href="{{ route('articles.show', $article->id) }}">Show</a>
+                <form action="{{ route('articles.destroy', $article->id) }}" method="POST" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@else
+<p>No articles found.</p>
+@endif
+@endsection
+
+```
+</details>
+
+
+<details>
+<summary>create.blade.php </summary>
+
+```php
+@extends('Layout.basicLayout')
+
+@section('content')
+<div>
+    <h3>Create Article</h3>
+    <a href="{{ route('articles.index') }}">Back to Articles</a>
+</div>
+
+<form method="POST" action="{{ route('articles.store') }}" enctype="multipart/form-data">
+    @csrf
+    <div>
+        <label for="title">Title</label>
+        <input type="text" name="title" value="{{ old('title') }}" id="title">
+    </div>
+    <div class="mb-3">
+        <label for="tag_id">Article Tag</label>
+        <select id="tag_id" name="tag_id">
+            <option value="">Select Tag</option>
+            @foreach($tags as $tag)
+            <option value="{{ $tag->id }}" {{ old('tag_id')==$tag->id ? 'selected' : '' }}>
+                {{ $tag->name }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    <div>
+        <label for="content">Content</label>
+        <textarea name="content" id="content" rows="5">{{ old('content') }}</textarea>
+    </div>
+    <div>
+        <label for="image">Image</label>
+        <input type="file" name="image" id="image">
+    </div>
+    <button type="submit">Create</button>
+</form>
+@endsection
+
+```
+</details>
+
+
+<details>
+<summary>edit.blade.php </summary>
+
+```php
+@extends('Layout.basicLayout')
+
+@section('content')
+<div>
+    <h3>Edit Article</h3>
+    <a href="{{ route('articles.index') }}">Back to Articles</a>
+</div>
+<form method="POST" action="{{ route('articles.update', $article->id) }}" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
+    <div>
+        <label for="title">Title</label>
+        <input type="text" name="title" value="{{ old('title', $article->title) }}" id="title">
+    </div>
+    <div class="mb-3">
+        <label for="tag_id">Article Tag</label>
+        <select id="tag_id" name="tag_id">
+            <option value="">Select Tag</option>
+            @foreach($tags as $tag)
+            <option value="{{ $tag->id }}" {{ old('tag_id', $article->tag_id) == $tag->id ?
+                'selected' : '' }}>
+                {{ $tag->name }}
+            </option>
+            @endforeach
+        </select>
+    </div>
+    <div>
+        <label for="content">Content</label>
+        <textarea name="content" id="content" rows="5">{{ old('content', $article->content) }}</textarea>
+    </div>
+    <div>
+        <label for="image">Image</label>
+        <input type="file" name="image" id="image">
+        @if($article->image)
+        <img src="{{ asset('images/articles/' . $article->image) }}" alt="Article Image"
+            style="width:40px; height:40px; object-fit:cover; border-radius:50%;">
+        @endif
+    </div>
+    <button type="submit">Update</button>
+
+    @endsection
+
+```
+</details>
+
+</details>
+
+
+
+
+<!-- --------------------------------------- :: -->
+<!-- --------------------------------------- :: -->
+#### Laravel 12 with Livewire & Volt
+
+<details>
+<summary>Migration </summary>
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('studies', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->string('category');
+            $table->enum('status', ['NotStarted', 'InProgress', 'Completed'])->default('NotStarted');
+            $table->enum('priority', ['Low', 'Medium', 'High'])->default('Medium');
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
+            $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')->onUpdate('cascade');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('studies');
+    }
+};
+
+```
+</details>
+
+<details>
+<summary>Model </summary>
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Study extends Model
+{
+    protected $fillable = [
+        'user_id',
+        'title',
+        'description',
+        'category',
+        'status',
+        'priority',
+        'start_date',
+        'end_date',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+}
+
+```
+</details>
+
+<details>
+<summary>Route </summary>
+
+```php
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Features;
+use Livewire\Volt\Volt;
+
+Route::get('/', function () { return view('welcome'); })->name('home');
+Route::view('dashboard', 'dashboard')->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::redirect('settings', 'settings/profile');
+    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
+    Volt::route('settings/password', 'settings.password')->name('password.edit');
+    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('settings/two-factor', 'settings.two-factor')
+        ->middleware(
+            when(
+                Features::canManageTwoFactorAuthentication()
+                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                ['password.confirm'],
+                [],
+            ),
+        )
+        ->name('two-factor.show');
+
+    // Study Tracker CRUD Routes
+    // ---------------------------------------------------- ::
+    Volt::route('studies', 'studies.index')->name('studies.index');
+    Volt::route('studies/create', 'studies.create')->name('studies.create');
+    Volt::route('studies/{study}/edit', 'studies.edit')->name('studies.edit');
+    Volt::route('studies/{study}', 'studies.show')->name('studies.show');
+});
+
+require __DIR__.'/auth.php';
+
+```
+</details>
+
+<details>
+<summary>Blade (logic & UI together) </summary>
+
+- `resources/views/livewire/studies/index.blade.php` – Main logic and UI for listing, filtering, deleting studies
+- `resources/views/livewire/studies/create.blade.php` – Logic and UI for creating a new study
+- `resources/views/livewire/studies/edit.blade.php` – Logic and UI for editing a study
+- `resources/views/livewire/studies/show.blade.php` – Study details view (logic and UI)
+
+<details>
+<summary>index.blade.php</summary>
+
+```php
+<?php
+
+use App\Models\Study;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+use Livewire\WithPagination;
+
+new #[Layout('components.layouts.app')] class extends Component {
+    // Pagination trait for handling pagination
+    use WithPagination;
+
+    // Filter and search properties
+    public $search = '';
+    public $status = '';
+    public $category = '';
+    public $priority = '';
+
+    // Fetch studies with applied filters and pagination
+    public function with(): array
+    {
+        $query = Study::where('user_id', auth()->id())
+            ->when($this->search, fn($q) => $q->where('title', 'like', '%' . $this->search . '%')
+                ->orWhere('description', 'like', '%' . $this->search . '%'))
+            ->when($this->status, fn($q) => $q->where('status', $this->status))
+            ->when($this->category, fn($q) => $q->where('category', $this->category))
+            ->when($this->priority, fn($q) => $q->where('priority', $this->priority))
+            ->orderBy('created_at', 'desc');
+
+        return [
+            'studies' => $query->paginate(10),
+            'totalStudies' => Study::where('user_id', auth()->id())->count(),
+            'completedStudies' => Study::where('user_id', auth()->id())->where('status', 'Completed')->count(),
+            'inProgressStudies' => Study::where('user_id', auth()->id())->where('status', 'InProgress')->count(),
+        ];
+    }
+
+    // Reset pagination when search or filters change
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    // Reset pagination when filters change
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->status = '';
+        $this->category = '';
+        $this->priority = '';
+        $this->resetPage();
+    }
+
+    public $confirmingDeleteId = null;
+
+    public function confirmDelete($studyId)
+    {
+        $this->confirmingDeleteId = $studyId;
+        $this->dispatch('openDeleteModal', $studyId);
+    }
+
+    public function delete($studyId)
+    {
+        $study = Study::where('user_id', auth()->id())->findOrFail($studyId);
+        $study->delete();
+        $this->confirmingDeleteId = null;
+        session()->flash('message', 'Study deleted successfully!');
+    }
+};
+?>
+
+<div class="space-y-6">
+    <!-- Page Header -->
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+            <flux:heading size="xl">Study Tracker</flux:heading>
+            <flux:subheading>Manage your learning progress and track study goals</flux:subheading>
+        </div>
+        <div class="flex gap-3">
+            <flux:button :href="route('studies.create')" variant="primary" icon="plus" wire:navigate>
+                Add New Study
+            </flux:button>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-zinc-600 dark:text-zinc-400">Total Studies</p>
+                    <p class="text-2xl font-bold text-zinc-900 dark:text-white">{{ $totalStudies }}</p>
+                </div>
+                <div class="rounded-full bg-blue-100 p-3 dark:bg-blue-900">
+                    <flux:icon name="book-open" class="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-zinc-600 dark:text-zinc-400">In Progress</p>
+                    <p class="text-2xl font-bold text-zinc-900 dark:text-white">{{ $inProgressStudies }}</p>
+                </div>
+                <div class="rounded-full bg-yellow-100 p-3 dark:bg-yellow-900">
+                    <flux:icon name="clock" class="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+                </div>
+            </div>
+        </div>
+
+        <div class="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-zinc-600 dark:text-zinc-400">Completed</p>
+                    <p class="text-2xl font-bold text-zinc-900 dark:text-white">{{ $completedStudies }}</p>
+                </div>
+                <div class="rounded-full bg-green-100 p-3 dark:bg-green-900">
+                    <flux:icon name="check-circle" class="h-6 w-6 text-green-600 dark:text-green-400" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-800">
+        <div class="mb-4 flex items-center justify-between">
+            <flux:heading size="lg">Filters</flux:heading>
+            <flux:button wire:click="resetFilters" variant="ghost" size="sm">
+                Reset All
+            </flux:button>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-4">
+            <!-- Search -->
+            <flux:input wire:model.live="search" placeholder="Search studies..." icon="magnifying-glass" />
+
+            <!-- Status Filter -->
+            <flux:select wire:model.live="status" placeholder="All Statuses">
+                <option value="">All Statuses</option>
+                <option value="NotStarted">Not Started</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Completed">Completed</option>
+            </flux:select>
+
+            <!-- Category Filter -->
+            <flux:select wire:model.live="category" placeholder="All Categories">
+                <option value="">All Categories</option>
+                <option value="Web Development">Web Development</option>
+                <option value="Database">Database</option>
+                <option value="Programming">Programming</option>
+                <option value="Framework">Framework</option>
+                <option value="Other">Other</option>
+            </flux:select>
+
+            <!-- Priority Filter -->
+            <flux:select wire:model.live="priority" placeholder="All Priorities">
+                <option value="">All Priorities</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </flux:select>
+        </div>
+    </div>
+
+    <!-- Studies Table -->
+    <div class="rounded-lg border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800">
+        <div class="p-6">
+            <flux:heading size="lg">Your Studies</flux:heading>
+        </div>
+
+        @if($studies->count() > 0)
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="border-b border-zinc-200 dark:border-zinc-700">
+                    <tr>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            Study
+                        </th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            Category
+                        </th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            Status
+                        </th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            Priority
+                        </th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            Start Date
+                        </th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            End Date
+                        </th>
+                        <th
+                            class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-700">
+                    @foreach($studies as $study)
+                    <tr class="hover:bg-zinc-50 dark:hover:bg-zinc-700/50">
+                        <td class="px-6 py-4">
+                            <div>
+                                <div class="font-medium text-zinc-900 dark:text-white">
+                                    {{ $study->title }}
+                                </div>
+                                @if($study->description)
+                                <div class="text-sm text-zinc-500 dark:text-zinc-400">
+                                    {{ Str::limit($study->description, 60) }}
+                                </div>
+                                @endif
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <flux:badge size="sm" color="zinc">{{ $study->category }}</flux:badge>
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($study->status === 'Completed')
+                            <flux:badge size="sm" color="green">Completed</flux:badge>
+                            @elseif($study->status === 'InProgress')
+                            <flux:badge size="sm" color="yellow">In Progress</flux:badge>
+                            @else
+                            <flux:badge size="sm" color="gray">Not Started</flux:badge>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4">
+                            @if($study->priority === 'High')
+                            <flux:badge size="sm" color="red">High</flux:badge>
+                            @elseif($study->priority === 'Medium')
+                            <flux:badge size="sm" color="orange">Medium</flux:badge>
+                            @else
+                            <flux:badge size="sm" color="blue">Low</flux:badge>
+                            @endif
+                        </td>
+                        <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                            {{ $study->start_date?->format('M d, Y') ?? 'Not set' }}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-zinc-500 dark:text-zinc-400">
+                            {{ $study->end_date?->format('M d, Y') ?? 'Not set' }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <flux:button :href="route('studies.show', $study)" size="sm" variant="ghost"
+                                    wire:navigate>
+                                    View
+                                </flux:button>
+                                <flux:button :href="route('studies.edit', $study)" size="sm" variant="ghost"
+                                    wire:navigate>
+                                    Edit
+                                </flux:button>
+                                <flux:button wire:click="confirmDelete({{ $study->id }})" size="sm" variant="danger">
+                                    Delete
+                                </flux:button>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="px-6 py-4">
+            {{ $studies->links() }}
+        </div>
+        @else
+        <!-- Empty State -->
+        <div class="p-12 text-center">
+            <flux:icon name="book-open" class="mx-auto h-12 w-12 text-zinc-400" />
+            <flux:heading size="lg" class="mt-4">No studies found</flux:heading>
+            <flux:subheading class="mt-2">
+                @if($search || $status || $category || $priority)
+                No studies match your current filters. Try adjusting your search criteria.
+                @else
+                Get started by creating your first study to track your learning progress.
+                @endif
+            </flux:subheading>
+            <div class="mt-6">
+                @if($search || $status || $category || $priority)
+                <flux:button wire:click="resetFilters" variant="outline">
+                    Clear Filters
+                </flux:button>
+                @else
+                <flux:button :href="route('studies.create')" variant="primary" wire:navigate>
+                    Create Your First Study
+                </flux:button>
+                @endif
+            </div>
+        </div>
+        @endif
+    </div>
+
+
+    <!-- Flash Messages -->
+    @if (session()->has('message'))
+    <div class="rounded-md bg-green-50 p-4 dark:bg-green-900/20">
+        <div class="flex">
+            <flux:icon name="check-circle" class="h-5 w-5 text-green-400" />
+            <div class="ml-3">
+                <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                    {{ session('message') }}
+                </p>
+            </div>
+        </div>
+    </div>
+    @endif
+</div>
+
+```
+</details>
+
+<details>
+<summary>create.blade.php</summary>
+
+```php
+<?php
+
+use App\Models\Study;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+
+new #[Layout('components.layouts.app')] class extends Component {
+    public $title = '';
+    public $description = '';
+    public $status = '';
+    public $category = '';
+    public $priority = '';
+    public $start_date = '';
+    public $end_date = '';
+
+    // Validation rules for study creation
+    public function rules()
+    {
+        return [
+            'title' => 'required|string|max:100',
+            'description' => 'nullable|string|max:500',
+            'status' => 'required|in:NotStarted,InProgress,Completed',
+            'category' => 'required|string|max:50',
+            'priority' => 'required|in:Low,Medium,High',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ];
+    }
+
+    // Save new study to the database
+    public function save()
+    {
+        $this->validate();
+        Study::create([
+            'user_id' => auth()->id(),
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'category' => $this->category,
+            'priority' => $this->priority,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+        ]);
+        session()->flash('message', 'Study created successfully!');
+        return redirect()->route('studies.index');
+    }
+};
+?>
+
+<div class="space-y-6">
+    {{-- Page Header --}}
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+            <flux:heading size="xl">Add New Study</flux:heading>
+            <flux:subheading>Fill in the details to track a new study topic.</flux:subheading>
+        </div>
+        <flux:button :href="route('studies.index')" variant="primary" icon="arrow-left" wire:navigate>
+            Back To Studies
+        </flux:button>
+    </div>
+
+    <div class="max-w-2xl mx-auto space-y-8">
+        {{-- Form for creating a new study :: --}}
+        <form wire:submit.prevent="save" class="space-y-6">
+            <div class="grid gap-4 md:grid-cols-2">
+                <flux:input label="Title" wire:model.defer="title" required placeholder="Enter study title" />
+                <flux:select label="Status" wire:model.defer="status" required placeholder="Select status">
+                    <option value="">Select status</option>
+                    <option value="NotStarted">Not Started</option>
+                    <option value="InProgress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </flux:select>
+                <flux:select label="Category" wire:model.defer="category" required placeholder="Select category">
+                    <option value="">Select category</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Database">Database</option>
+                    <option value="Programming">Programming</option>
+                    <option value="Framework">Framework</option>
+                    <option value="Other">Other</option>
+                </flux:select>
+                <flux:select label="Priority" wire:model.defer="priority" required placeholder="Select priority">
+                    <option value="">Select priority</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </flux:select>
+            </div>
+            <flux:textarea label="Description" wire:model.defer="description"
+                placeholder="Add a short description (optional)" />
+            <div class="grid gap-4 md:grid-cols-2">
+                <flux:input label="Start Date" type="date" wire:model.defer="start_date" />
+                <flux:input label="End Date" type="date" wire:model.defer="end_date" />
+            </div>
+            <div class="flex gap-3 justify-end">
+                <flux:button :href="route('studies.index')" variant="ghost" type="button" wire:navigate>Cancel
+                </flux:button>
+                <flux:button type="submit" variant="primary" icon="plus">Create Study</flux:button>
+            </div>
+        </form>
+
+        {{-- Success Message :: --}}
+        @if (session()->has('message'))
+            <div class="rounded-md bg-green-50 p-4 dark:bg-green-900/20">
+                <div class="flex">
+                    <flux:icon name="check-circle" class="h-5 w-5 text-green-400" />
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                            {{ session('message') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
+
+```
+</details>
+
+<details>
+<summary>edit.blade.php</summary>
+
+```php
+<?php
+
+use App\Models\Study;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+
+new #[Layout('components.layouts.app')] class extends Component {
+    // Properties for the study form
+    public $study;
+    public $title = '';
+    public $description = '';
+    public $status = '';
+    public $category = '';
+    public $priority = '';
+    public $start_date = '';
+    public $end_date = '';
+
+    // Initialize component with existing study data
+    public function mount(Study $study)
+    {
+        $this->study = $study;
+        $this->title = $study->title;
+        $this->description = $study->description;
+        $this->status = $study->status;
+        $this->category = $study->category;
+        $this->priority = $study->priority;
+        $this->start_date = $study->start_date?->format('Y-m-d');
+        $this->end_date = $study->end_date?->format('Y-m-d');
+    }
+
+    // Validation rules for study editing
+    public function rules()
+    {
+        return [
+            'title' => 'required|string|max:100',
+            'description' => 'nullable|string|max:500',
+            'status' => 'required|in:NotStarted,InProgress,Completed',
+            'category' => 'required|string|max:50',
+            'priority' => 'required|in:Low,Medium,High',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+        ];
+    }
+
+    // Update study in the database
+    public function update()
+    {
+        $this->validate();
+        $this->study->update([
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status,
+            'category' => $this->category,
+            'priority' => $this->priority,
+            'start_date' => $this->start_date,
+            'end_date' => $this->end_date,
+        ]);
+        session()->flash('message', 'Study updated successfully!');
+        return redirect()->route('studies.index');
+    }
+};
+?>
+
+<div class="space-y-6">
+    {{-- Page Header --}}
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+            <flux:heading size="xl">Edit Study</flux:heading>
+            <flux:subheading>Update the details for this study topic.</flux:subheading>
+        </div>
+        <flux:button :href="route('studies.index')" variant="primary" icon="arrow-left" wire:navigate>
+            Back To Studies
+        </flux:button>
+    </div>
+
+    <div class="max-w-2xl mx-auto space-y-8">
+        {{-- Form for editing a study :: --}}
+        <form wire:submit.prevent="update" class="space-y-6">
+            <div class="grid gap-4 md:grid-cols-2">
+                <flux:input label="Title" wire:model.defer="title" required placeholder="Enter study title" />
+                <flux:select label="Status" wire:model.defer="status" required placeholder="Select status">
+                    <option value="">Select status</option>
+                    <option value="NotStarted">Not Started</option>
+                    <option value="InProgress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                </flux:select>
+                <flux:select label="Category" wire:model.defer="category" required placeholder="Select category">
+                    <option value="">Select category</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Database">Database</option>
+                    <option value="Programming">Programming</option>
+                    <option value="Framework">Framework</option>
+                    <option value="Other">Other</option>
+                </flux:select>
+                <flux:select label="Priority" wire:model.defer="priority" required placeholder="Select priority">
+                    <option value="">Select priority</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </flux:select>
+            </div>
+            <flux:textarea label="Description" wire:model.defer="description"
+                placeholder="Add a short description (optional)" />
+            <div class="grid gap-4 md:grid-cols-2">
+                <flux:input label="Start Date" type="date" wire:model.defer="start_date" />
+                <flux:input label="End Date" type="date" wire:model.defer="end_date" />
+            </div>
+            <div class="flex gap-3 justify-end">
+                <flux:button :href="route('studies.index')" variant="ghost" type="button" wire:navigate>Cancel
+                </flux:button>
+                <flux:button type="submit" variant="primary" icon="check">Update Study</flux:button>
+            </div>
+        </form>
+
+        {{-- Success Message :: --}}
+        @if (session()->has('message'))
+            <div class="rounded-md bg-green-50 p-4 dark:bg-green-900/20">
+                <div class="flex">
+                    <flux:icon name="check-circle" class="h-5 w-5 text-green-400" />
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-green-800 dark:text-green-200">
+                            {{ session('message') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
+
+```
+</details>
+
+<details>
+<summary>show.blade.php</summary>
+
+```php
+<?php
+
+use App\Models\Study;
+use Livewire\Attributes\Layout;
+use Livewire\Volt\Component;
+
+new #[Layout('components.layouts.app')] class extends Component {
+    // Property to hold the study instance
+    public $study;
+
+    // Initialize component with the study data
+    public function mount(Study $study)
+    {
+        $this->study = $study;
+    }
+};
+?>
+
+<div class="space-y-6 max-w-2xl mx-auto">
+    {{-- Page Header --}}
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+            <flux:heading size="xl">Study Details</flux:heading>
+            <flux:subheading>View all information for this study topic.</flux:subheading>
+        </div>
+        <flux:button :href="route('studies.index')" variant="primary" icon="arrow-left" wire:navigate>
+            Back To Studies
+        </flux:button>
+    </div>
+
+    <div class="rounded-lg border border-zinc-200 bg-white p-8 dark:border-zinc-700 dark:bg-zinc-800 space-y-6">
+        <div class="flex flex-col gap-2">
+            <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Title</span>
+            <span class="text-lg font-bold text-zinc-900 dark:text-white">{{ $study->title }}</span>
+        </div>
+        <div class="flex flex-col gap-2">
+            <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Description</span>
+            <span class="text-zinc-700 dark:text-zinc-300">{{ $study->description ?: '—' }}</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Status</span>
+                @if($study->status === 'Completed')
+                    <flux:badge size="sm" color="green">Completed</flux:badge>
+                @elseif($study->status === 'InProgress')
+                    <flux:badge size="sm" color="yellow">In Progress</flux:badge>
+                @else
+                    <flux:badge size="sm" color="gray">Not Started</flux:badge>
+                @endif
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Priority</span>
+                @if($study->priority === 'High')
+                    <flux:badge size="sm" color="red">High</flux:badge>
+                @elseif($study->priority === 'Medium')
+                    <flux:badge size="sm" color="orange">Medium</flux:badge>
+                @else
+                    <flux:badge size="sm" color="blue">Low</flux:badge>
+                @endif
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Category</span>
+                <flux:badge size="sm" color="zinc">{{ $study->category }}</flux:badge>
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">Start Date</span>
+                <span class="text-zinc-700 dark:text-zinc-300">{{ $study->start_date ? $study->start_date->format('M d, Y') : 'Not set' }}</span>
+            </div>
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-medium text-zinc-500 dark:text-zinc-400">End Date</span>
+                <span class="text-zinc-700 dark:text-zinc-300">{{ $study->end_date ? $study->end_date->format('M d, Y') : 'Not set' }}</span>
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end pt-4">
+            <flux:button :href="route('studies.edit', $study)" variant="ghost" icon="pencil" wire:navigate>Edit</flux:button>
+            <flux:button :href="route('studies.index')" variant="outline" icon="arrow-left" wire:navigate>Back</flux:button>
+        </div>
+    </div>
+</div>
+
+```
+</details>
+
+</details>
+
+
+
+
+
+<!-- --------------------------------------- :: -->
+<!-- --------------------------------------- :: -->
+#### Laravel 12 with ReactJS & Inertia.js
+
+<details>
+<summary>Migration </summary>
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('products', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->decimal('price', 10, 2);
+            $table->text('description')->nullable();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('products');
+    }
+};
+
+```
+</details>
+
+<details>
+<summary>Model </summary>
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    protected $fillable = ['name', 'price', 'description'];
+}
+
+```
+</details>
+
+
+<details>
+<summary>Routes </summary>
+
+```php
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Backend\ProductController;
+
+// Route::get('/backend/products', function () { return view('Backend.Products.index'); });
+
+Route::prefix('backend')->name('backend.')->group(function () {
+
+    // Products ::
+    Route::resource('products', ProductController::class);
+    Route::get('products/{product}/delete', [ProductController::class, 'delete'])->name('products.delete');
+});
+
+
+```
+</details>
+
+
+<details>
+<summary>Controller </summary>
+
+```php
+<?php
+
+namespace App\Http\Controllers\Backend;
+
+use Inertia\Inertia;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class ProductController extends Controller
+{
+    public function index()
+    {
+        // Fetch products from the database
+        $products = Product::all();
+        return Inertia::render('products/index', compact('products'));
+    }
+
+    public function create()
+    {
+        return Inertia::render('products/create');
+    }
+
+    public function store(Request $request)
+    {
+        // Validate and store the product data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ], [
+            'name.required' => 'The product name is required.',
+            'price.required' => 'The product price is required.',
+            'price.numeric' => 'The product price must be a number.',
+            'price.min' => 'The product price must be at least 0.',
+        ]);
+
+        // Assuming you have a Product model to handle the storage
+          Product::create($validatedData);
+
+        return redirect()->route('backend.products.index')->with('success', 'Product created successfully.');
+    }
+
+    public function show(Product $product)
+    {
+        return Inertia::render('products/show', compact('product'));
+    }
+
+    public function edit(Product $product){
+        return Inertia::render('products/edit', compact('product'));
+    }
+
+    public function update(Product $product, Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0',
+            'description' => 'nullable|string',
+        ], [
+            'name.required' => 'The product name is required.',
+            'price.required' => 'The product price is required.',
+            'price.numeric' => 'The product price must be a number.',
+            'price.min' => 'The product price must be at least 0.',
+        ]);
+
+        $product->update($validatedData);
+
+        return redirect()->route('backend.products.index')->with('success', 'Product updated successfully.');
+    }
+
+    public function destroy(Product $product){
+        $product->delete();
+        return redirect()->route('backend.products.index')->with('success', 'Product deleted successfully.');
+    }
+}
+
+```
+</details>
+
+
+<details>
+<summary>Views </summary>
+
+``` resources\js\pages\products\index.jsx ```
+
+
+<details>
+<summary>index.jsx </summary>
+
+```jsx
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Megaphone } from 'lucide-react';
+import { useEffect, useState } from 'react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Products',
+        href: '/backend/products',
+    },
+];
+
+interface PageProps {
+    flash: {
+        success?: string;
+        error?: string;
+    };
+}
+
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+}
+
+export default function Index() {
+    const flashFromPage = (usePage().props as Partial<PageProps>).flash || {};
+    const [flash, setFlash] = useState(flashFromPage);
+    const { products = [] } = usePage().props as { products: Product[] };
+    const { processing, delete: destroy } = useForm();
+
+    useEffect(() => {
+        setFlash(flashFromPage);
+        if (flashFromPage.success || flashFromPage.error) {
+            const timer = setTimeout(() => {
+                setFlash({});
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [flashFromPage.success, flashFromPage.error]);
+
+    const handleDelete = (id: number, name: string) => {
+        if (confirm(`Do you want to delete a product - ${id}. ${name}`)) {
+            destroy(route('backend.products.destroy', id));
+        }
+    };
+
+    return (
+        // Using app-layout ::
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Product" />
+            <div className="m-4">
+                <Link
+                    href={route('backend.products.create')}
+                    className="inline-flex items-center justify-center rounded-md bg-primary px-1 py-1 text-sm font-medium text-white hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none"
+                >
+                    <Button>Create</Button>
+                </Link>
+            </div>
+            <div className="m-4">
+                {(flash.success || flash.error) && (
+                    <Alert className="mb-4">
+                        <Megaphone className="h-4 w-4" />
+                        <AlertTitle>Notification!</AlertTitle>
+                        <AlertDescription>{flash.success || flash.error}</AlertDescription>
+                    </Alert>
+                )}
+            </div>
+            {products.length > 0 && (
+                <div className="m-4 overflow-x-auto rounded-xl border border-gray-200 bg-white shadow dark:border-gray-700 dark:bg-gray-900">
+                    <Table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <TableCaption className="px-4 py-2 text-left text-gray-500 dark:text-gray-400">A list of your recent products.</TableCaption>
+                        <TableHeader>
+                            <TableRow className="bg-gray-50 dark:bg-gray-800">
+                                <TableHead className="w-[100px] px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-700 uppercase dark:text-gray-200">
+                                    ID
+                                </TableHead>
+                                <TableHead className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-700 uppercase dark:text-gray-200">
+                                    Name
+                                </TableHead>
+                                <TableHead className="px-4 py-3 text-left text-xs font-semibold tracking-wider text-gray-700 uppercase dark:text-gray-200">
+                                    Price
+                                </TableHead>
+                                <TableHead className="px-4 py-3 text-center text-xs font-semibold tracking-wider text-gray-700 uppercase dark:text-gray-200">
+                                    Action
+                                </TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products.map((product) => (
+                                <TableRow key={product.id} className="transition-colors hover:bg-gray-100 dark:hover:bg-gray-800">
+                                    <TableCell className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{product.id}</TableCell>
+                                    <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-200">{product.name}</TableCell>
+                                    <TableCell className="px-4 py-3 text-gray-700 dark:text-gray-200">{product.price}</TableCell>
+                                    <TableCell className="space-x-2 px-4 py-3 text-center">
+                                        <Link href={route('backend.products.show', product.id)}>
+                                            <Button className="bg-blue-500 hover:bg-blue-600">View</Button>
+                                        </Link>
+                                        <Link href={route('backend.products.edit', product.id)}>
+                                            <Button className="bg-slate-600 hover:bg-slate-700">Edit</Button>
+                                        </Link>
+                                        <Button
+                                            disabled={processing}
+                                            onClick={() => handleDelete(product.id, product.name)}
+                                            className="bg-red-500 hover:bg-red-700"
+                                        >
+                                            Delete
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </div>
+            )}
+        </AppLayout>
+    );
+}
+
+```
+</details>
+
+<details>
+<summary>create.jsx </summary>
+
+```jsx
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, useForm } from '@inertiajs/react';
+import { CircleAlert } from 'lucide-react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Create New Product',
+        href: '/backend/products/create',
+    },
+];
+
+export default function Create() {
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        price: '',
+        description: '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        post(route('backend.products.store'), {
+            onSuccess: () => {
+                setData({ name: '', price: '', description: '' }); // Reset form after successful submission
+            },
+        });
+    };
+
+    return (
+        // Using app-layout ::
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Create Product" />
+            <div className="m-4">
+                <Link
+                    href={route('backend.products.index')}
+                    className="inline-flex items-center justify-center rounded-md bg-primary text-sm font-medium text-white hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none"
+                >
+                    <Button>Back</Button>
+                </Link>
+            </div>
+            {Object.keys(errors).length > 0 && (
+                <div className="flex justify-center">
+                    <Alert variant="destructive" className="mb-6 flex w-full max-w-5xl items-start gap-3">
+                        <CircleAlert className="mt-1 h-5 w-5 text-red-600 dark:text-red-400" />
+                        <div>
+                            <AlertTitle>There were some errors with your submission:</AlertTitle>
+                            <AlertDescription>
+                                <ul className="list-inside list-disc">
+                                    {Object.values(errors).map((err, i) => (
+                                        <li key={i}>{err}</li>
+                                    ))}
+                                </ul>
+                            </AlertDescription>
+                        </div>
+                    </Alert>
+                </div>
+            )}
+            <div className="flex min-h-[60vh] items-center justify-center">
+                <form
+                    onSubmit={handleSubmit}
+                    className="w-full max-w-5xl space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg dark:border-gray-700 dark:bg-gray-900"
+                    action=""
+                >
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <Label htmlFor="name" className="mb-1 block font-semibold text-gray-700 dark:text-gray-200">
+                                Product Name
+                            </Label>
+                            <Input
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                id="name"
+                                name="name"
+                                type="text"
+                                className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                            />
+                            {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+                        </div>
+                        <div>
+                            <Label htmlFor="price" className="mb-1 block font-semibold text-gray-700 dark:text-gray-200">
+                                Price
+                            </Label>
+                            <Input
+                                value={data.price}
+                                onChange={(e) => setData('price', e.target.value)}
+                                id="price"
+                                name="price"
+                                type="number"
+                                step="0.01"
+                                className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                            />
+                            {errors.price && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.price}</p>}
+                        </div>
+                    </div>
+                    <div>
+                        <Label htmlFor="description" className="mb-1 block font-semibold text-gray-700 dark:text-gray-200">
+                            Description
+                        </Label>
+                        <Textarea
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            id="description"
+                            name="description"
+                            placeholder="Type your message here."
+                            className="min-h-[100px] w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                        />
+                        {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
+                    </div>
+                    <div className="flex justify-end pt-2">
+                        <Button
+                            type="submit"
+                            className="rounded-md bg-primary px-6 py-2 font-semibold text-white hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none"
+                        >
+                            Add Product
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </AppLayout>
+    );
+}
+
+```
+</details>
+
+<details>
+<summary>edit.jsx </summary>
+
+```jsx
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { CircleAlert } from 'lucide-react';
+
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Edit Product',
+        href: '/backend/products/edit',
+    },
+];
+
+interface Product {
+    id: number;
+    name: string;
+    price: number;
+    description?: string;
+}
+
+export default function Edit() {
+    const { product } = usePage().props as { product: Product };
+    const { data, setData, put, processing, errors } = useForm({
+        name: product.name || '',
+        price: product.price || '',
+        description: product.description || '',
+    });
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        put(route('backend.products.update', product.id));
+    };
+
+    return (
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Edit Product" />
+            <div className="m-4">
+                <Link
+                    href={route('backend.products.index')}
+                    className="inline-flex items-center justify-center rounded-md bg-primary text-sm font-medium text-white hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none"
+                >
+                    <Button>Back</Button>
+                </Link>
+            </div>
+            {Object.keys(errors).length > 0 && (
+                <div className="flex justify-center">
+                    <Alert variant="destructive" className="mb-6 flex w-full max-w-5xl items-start gap-3">
+                        <CircleAlert className="mt-1 h-5 w-5 text-red-600 dark:text-red-400" />
+                        <div>
+                            <AlertTitle>There were some errors with your submission:</AlertTitle>
+                            <AlertDescription>
+                                <ul className="list-inside list-disc">
+                                    {Object.values(errors).map((err, i) => (
+                                        <li key={i}>{err}</li>
+                                    ))}
+                                </ul>
+                            </AlertDescription>
+                        </div>
+                    </Alert>
+                </div>
+            )}
+            <div className="flex min-h-[60vh] items-center justify-center">
+                <form
+                    onSubmit={handleSubmit}
+                    className="w-full max-w-5xl space-y-6 rounded-xl border border-gray-200 bg-white p-8 shadow-lg dark:border-gray-700 dark:bg-gray-900"
+                    action=""
+                >
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                        <div>
+                            <Label htmlFor="name" className="mb-1 block font-semibold text-gray-700 dark:text-gray-200">
+                                Product Name
+                            </Label>
+                            <Input
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                id="name"
+                                name="name"
+                                type="text"
+                                className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                            />
+                            {errors.name && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.name}</p>}
+                        </div>
+                        <div>
+                            <Label htmlFor="price" className="mb-1 block font-semibold text-gray-700 dark:text-gray-200">
+                                Price
+                            </Label>
+                            <Input
+                                value={data.price}
+                                onChange={(e) => setData('price', e.target.value)}
+                                id="price"
+                                name="price"
+                                type="number"
+                                step="0.01"
+                                className="w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                            />
+                            {errors.price && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.price}</p>}
+                        </div>
+                    </div>
+                    <div>
+                        <Label htmlFor="description" className="mb-1 block font-semibold text-gray-700 dark:text-gray-200">
+                            Description
+                        </Label>
+                        <Textarea
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            id="description"
+                            name="description"
+                            placeholder="Type your message here."
+                            className="min-h-[100px] w-full rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 focus:ring-2 focus:ring-primary/50 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+                        />
+                        {errors.description && <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
+                    </div>
+                    <div className="flex justify-end pt-2">
+                        <Button
+                            type="submit"
+                            className="rounded-md bg-primary px-6 py-2 font-semibold text-white hover:bg-primary/90 focus:ring-2 focus:ring-primary/50 focus:outline-none"
+                        >
+                            Update Product
+                        </Button>
+                    </div>
+                </form>
+            </div>
+        </AppLayout>
+    );
+}
+
+```
+</details>
+</details>
