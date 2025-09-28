@@ -8025,77 +8025,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 #### CakePhp
 
 <details>
-<summary>Migration</summary>
-
-```text
-├── config/
-│   ├── Migrations/
-│   │   └── 20230101000000_CreateUsers.php # Users table migration
-```
-
-```php
-<?php
-declare(strict_types=1);
-use Migrations\BaseMigration;
-
-// Migration to create the 'users' table with required columns and unique email index
-class CreateUsers extends BaseMigration
-{
-    public function change(): void
-    {
-        // Create 'users' table
-        $table = $this->table('users');
-
-        // Add 'name' column (string, required)
-        $table->addColumn('name', 'string', [
-            'default' => null,
-            'limit' => 255,
-            'null' => false,
-        ]);
-
-        // Add 'email' column (string, required)
-        $table->addColumn('email', 'string', [
-            'default' => null,
-            'limit' => 255,
-            'null' => false,
-        ]);
-
-        // Add 'password' column (string, required, hashed password)
-        $table->addColumn('password', 'string', [
-            'default' => null,
-            'limit' => 255,
-            'null' => false,
-        ]);
-
-        // Add 'created' timestamp column (required)
-        $table->addColumn('created', 'datetime', [
-            'default' => null,
-            'null' => false,
-        ]);
-
-        // Add 'modified' timestamp column (required)
-        $table->addColumn('modified', 'datetime', [
-            'default' => null,
-            'null' => false,
-        ]);
-
-        // Add unique index on 'email' column
-        $table->addIndex([
-            'email',
-        ], [
-            'name' => 'UNIQUE_EMAIL',
-            'unique' => true,
-        ]);
-
-        // Create the table in the database
-        $table->create();
-    }
-}
-```
-
-</details>
-
-<details>
 <summary>Database Configuration</summary>
 
 ```text
@@ -8150,10 +8079,8 @@ return [
              * MySQL on MAMP uses port 8889, XAMPP uses port 3306
              */
             'port' => 3306,
-
             'username' => 'root',
             'password' => '',
-
             'database' => 'cakephp_lab',
             'encoding' => 'utf8mb4',
             'timezone' => 'UTC',
@@ -8212,6 +8139,118 @@ return [
 
 </details>
 
+
+<details>
+<summary>Migration</summary>
+
+```text
+├── config/
+│   ├── Migrations/
+│   │   └── 20230101000000_CreateUsers.php # Users table migration
+```
+
+```php
+bin/cake migrations create Todo
+```
+
+```php
+bin/cake migrations migrate
+```
+
+```php
+<?php
+declare(strict_types=1);
+use Migrations\BaseMigration;
+
+class Todo extends BaseMigration
+{
+    public function change(): void
+    {
+        $table = $this->table('todos');
+        $table->addColumn('title', 'string');
+        $table->addColumn('description', 'text');
+        $table->create();
+    }
+}
+```
+
+</details>
+
+
+<details>
+<summary>Model - Entity & Table</summary>
+
+```text
+├── src/
+│   └── Model/
+│       ├── Entity/
+│       │   └── User.php              # User entity with password hashing
+│       └── Table/
+│           └── UsersTable.php        # User database operations &
+```
+
+```php
+bin/cake bake model Todos
+```
+
+- Entity :
+```php
+<?php
+declare(strict_types=1);
+namespace App\Model\Entity;
+use Cake\ORM\Entity;
+
+class Todo extends Entity
+{
+    protected array $_accessible = [
+        'title' => true,
+        'description' => true,
+    ];
+}
+
+```
+
+- Table :
+```php
+<?php
+declare(strict_types=1);
+namespace App\Model\Table;
+use Cake\ORM\Query\SelectQuery;
+use Cake\ORM\RulesChecker;
+use Cake\ORM\Table;
+use Cake\Validation\Validator;
+
+class TodosTable extends Table
+{
+    public function initialize(array $config): void
+    {
+        parent::initialize($config);
+        $this->setTable('todos');
+        $this->setDisplayField('title');
+        $this->setPrimaryKey('id');
+    }
+
+    public function validationDefault(Validator $validator): Validator
+    {
+        $validator
+            ->scalar('title')
+            ->maxLength('title', 255)
+            ->requirePresence('title', 'create')
+            ->notEmptyString('title');
+
+        $validator
+            ->scalar('description')
+            ->requirePresence('description', 'create')
+            ->notEmptyString('description');
+
+        return $validator;
+    }
+}
+
+```
+</details>
+
+
 <details>
 <summary>Routes</summary>
 
@@ -8254,162 +8293,6 @@ return function (RouteBuilder $routes): void {
 
 </details>
 
-
-<details>
-<summary>Models - Entity</summary>
-
-```text
-├── src/
-│   └── Model/
-│       ├── Entity/
-│       │   └── User.php              # User entity with password hashing
-```
-
-```php
-<?php
-declare(strict_types=1);
-
-namespace App\Model\Entity;
-use Cake\Utility\Security;
-use Cake\ORM\Entity;
-
-/**
- * User Entity
- *
- * @property int $id
- * @property string $name
- * @property string $email
- * @property string $password
- * @property \Cake\I18n\DateTime $created
- * @property \Cake\I18n\DateTime $modified
- */
-class User extends Entity
-{
-    // Fields that can be mass assigned
-    protected array $_accessible = [
-        'name' => true,
-        'email' => true,
-        'password' => true,
-        'confirm_password' => true,
-        'created' => true,
-        'modified' => true,
-    ];
-
-    // Fields hidden from JSON or array output
-    protected array $_hidden = [
-        'password',
-    ];
-
-    // Hash password before saving to database
-    protected function _setPassword(string $password): ?string
-    {
-        if (strlen($password) > 0) {
-            return password_hash($password, PASSWORD_DEFAULT);
-        }
-        return null;
-    }
-
-    /**
-     * Check if given password matches the stored hash
-     * @param string $password Plain text password
-     * @return bool True if match, false otherwise
-    */
-    public function verifyPassword(string $password): bool
-    {
-        return password_verify($password, $this->password);
-    }
-}
-
-```
-
-</details>
-
-
-<details>
-<summary>Models - Table</summary>
-
-```text
-├── src/
-│   └── Model/
-│       └── Table/
-│           └── UsersTable.php        # User database operations &
-```
-
-```php
-<?php
-declare(strict_types=1);
-
-namespace App\Model\Table;
-
-use Cake\ORM\Query\SelectQuery;
-use Cake\ORM\RulesChecker;
-use Cake\ORM\Table;
-use Cake\Validation\Validator;
-
-// UsersTable handles all database logic for the users table
-class UsersTable extends Table
-{
-    // Set up table config and behaviors
-    public function initialize(array $config): void
-    {
-        parent::initialize($config);
-        $this->setTable('users'); // Table name in DB
-        $this->setDisplayField('name'); // Field to show in dropdowns/lists
-        $this->setPrimaryKey('id'); // Primary key column
-        $this->addBehavior('Timestamp'); // Auto-manage created/modified fields
-    }
-
-    // Define validation rules for user fields
-    public function validationDefault(Validator $validator): Validator
-    {
-        // Name: required, not empty, max 255 chars
-        $validator
-            ->scalar('name')
-            ->maxLength('name', 255)
-            ->requirePresence('name', 'create')
-            ->notEmptyString('name');
-
-        // Email: required, must be valid, unique
-        $validator
-            ->email('email')
-            ->requirePresence('email', 'create')
-            ->notEmptyString('email')
-            ->add('email', 'unique', ['rule' => 'validateUnique', 'provider' => 'table']);
-
-        // Password: required, not empty, min 6 chars
-        $validator
-            ->scalar('password')
-            ->maxLength('password', 255)
-            ->requirePresence('password', 'create')
-            ->notEmptyString('password')
-            ->minLength('password', 6, 'Password must be at least 6 characters long');
-
-        // Confirm password: must match password
-        $validator
-            ->scalar('confirm_password')
-            ->requirePresence('confirm_password', 'create')
-            ->notEmptyString('confirm_password')
-            ->add('confirm_password', 'compareWith', [
-                'rule' => ['compareWith', 'password'],
-                'message' => 'Password confirmation does not match password'
-            ]);
-
-        return $validator;
-    }
-
-    // Add application integrity rules
-    public function buildRules(RulesChecker $rules): RulesChecker
-    {
-        // Email must be unique in users table
-        $rules->add($rules->isUnique(['email']), ['errorField' => 'email']);
-        return $rules;
-    }
-}
-
-```
-
-</details>
-
 <details>
 <summary>Controller</summary>
 
@@ -8424,365 +8307,73 @@ class UsersTable extends Table
 ```
 
 ```php
-
+bin/cake bake controller Todos
 ```
 
-<details>
-<summary>AppController.php</summary>
-
-```php
-<?php
-declare(strict_types=1);
-namespace App\Controller;
-use Cake\Controller\Controller;
-
-class AppController extends Controller
-{
-    public function initialize(): void
-    {
-        parent::initialize();
-        $this->loadComponent('Flash');
-        /*
-         * Enable the following component for recommended CakePHP form protection settings.
-         * see https://book.cakephp.org/5/en/controllers/components/form-protection.html
-         */
-        //$this->loadComponent('FormProtection');
-    }
-}
-
-```
-
-</details>
-
-<details>
-<summary>PagesController.php</summary>
+- TodosController.php :
 
 ```php
 <?php
 declare(strict_types=1);
 namespace App\Controller;
 
-use Cake\Core\Configure;
-use Cake\Http\Exception\ForbiddenException;
-use Cake\Http\Exception\NotFoundException;
-use Cake\Http\Response;
-use Cake\View\Exception\MissingTemplateException;
-
-// Handles static pages (like home, about, etc.)
-class PagesController extends AppController
+class TodosController extends AppController
 {
-    // Renders a static page based on the URL path
-    public function display(string ...$path): ?Response
-    {
-        // If no path is given, redirect to home
-        if (!$path) {
-            return $this->redirect('/');
-        }
-        // Prevent directory traversal (security)
-        if (in_array('..', $path, true) || in_array('.', $path, true)) {
-            throw new ForbiddenException();
-        }
-
-        // Set page and subpage variables for the view
-        $page = $subpage = null;
-        if (!empty($path[0])) {
-            $page = $path[0];
-        }
-        if (!empty($path[1])) {
-            $subpage = $path[1];
-        }
-        $this->set(compact('page', 'subpage'));
-
-        // Try to render the requested template
-        try {
-            return $this->render(implode('/', $path));
-        } catch (MissingTemplateException $exception) {
-            // Show error if template not found
-            if (Configure::read('debug')) {
-                throw $exception;
-            }
-            throw new NotFoundException();
-        }
-    }
-}
-
-```
-
-</details>
-
-<details>
-<summary>AuthController.php</summary>
-
-```php
-<?php
-namespace App\Controller;
-use App\Controller\AppController;
-
-class AuthController extends AppController
-{
-    public function signup()
-    {
-        $usersTable = $this->fetchTable('Users');
-        $user = $usersTable->newEmptyEntity();
-
-        // GET request - Show signup form
-        if ($this->request->is('get')) {
-            $this->set(compact('user'));
-            return;
-        }
-
-        // POST request - Process signup form
-        if ($this->request->is('post')) {
-            // Patch entity with form data
-            $user = $usersTable->patchEntity($user, $this->request->getData());
-
-            // Attempt to save the user
-            if ($usersTable->save($user)) {
-                // Successfully created user
-                $this->Flash->success('Account created successfully! Please login to continue.');
-
-                // Redirect to login page
-                return $this->redirect(['action' => 'login']);
-            } else {
-                // Validation errors occurred
-                $this->Flash->error('There were some problems with your registration. Please check the form and try again.');
-
-                // Set the user entity with errors for the view
-                $this->set(compact('user'));
-            }
-        }
-    }
-
-    public function login()
-    {
-        // GET request - Show login form
-        if ($this->request->is('get')) {
-            // Just render the login template
-            return;
-        }
-
-        // POST request - Process login form
-        if ($this->request->is('post')) {
-            $email = $this->request->getData('email');
-            $password = $this->request->getData('password');
-
-            // Basic validation
-            if (empty($email) || empty($password)) {
-                $this->Flash->error('Please enter both email and password.');
-                return;
-            }
-
-            // Find user by email
-            $usersTable = $this->fetchTable('Users');
-            $user = $usersTable->find()
-                ->where(['email' => $email])
-                ->first();
-
-            // Check if user exists and password is correct
-            if ($user && $user->verifyPassword($password)) {
-                // Login successful - create session
-                $this->Flash->success('Welcome back, ' . h($user->name) . '!');
-
-                // Create user session
-                $this->request->getSession()->write('Auth.User', [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email
-                ]);
-
-                // Redirect to dashboard
-                return $this->redirect(['controller' => 'Dashboard', 'action' => 'index']);
-            } else {
-                // Login failed
-                $this->Flash->error('Invalid email or password. Please try again.');
-            }
-        }
-    }
-
-    public function logout()
-    {
-        // Destroy user session
-        $this->request->getSession()->delete('Auth.User');
-        // Clear all session data for security
-        $this->request->getSession()->destroy();
-        $this->Flash->success('You have been logged out successfully.');
-        return $this->redirect(['controller' => 'Pages', 'action' => 'display', 'home']);
-    }
-
-}
-
-```
-
-</details>
-
-<details>
-<summary>DashboardController.php</summary>
-
-```php
-<?php
-declare(strict_types=1);
-
-namespace App\Controller;
-
-use App\Controller\AppController;
-
-class DashboardController extends AppController
-{
-    public function initialize(): void
-    {
-        parent::initialize();
-        $this->checkUserAuth();
-    }
-
     public function index()
     {
-        // Get current user from session
-        $currentUser = $this->request->getSession()->read('Auth.User');
-        // Pass user data to view
-        $this->set(compact('currentUser'));
-    }
+        $query = $this->Todos->find();
+        $todos = $this->paginate($query);
 
-    /**
-     * Check if user is authenticated
-     * Redirect to login if not authenticated
-     *
-     * @return void
-     */
-    private function checkUserAuth(): void
-    {
-        if (!$this->request->getSession()->check('Auth.User')) {
-            $this->Flash->error('Please login to access the dashboard.');
-            $this->redirect(['controller' => 'Auth', 'action' => 'login']);
-        }
-    }
-}
-
-```
-
-</details>
-
-<details>
-<summary>UsersController.php</summary>
-
-```php
-<?php
-declare(strict_types=1);
-
-namespace App\Controller;
-
-class UsersController extends AppController
-{
-    public function initialize(): void
-    {
-        parent::initialize();
-
-        // Load Flash component
-        $this->loadComponent('Flash');
-    }
-
-    public function beforeFilter(\Cake\Event\EventInterface $event)
-    {
-        parent::beforeFilter($event);
-
-        // Check if user is logged in for all actions
-        $session = $this->request->getSession();
-        if (!$session->check('Auth.User')) {
-            $this->Flash->error(__('You need to login first.'));
-            return $this->redirect(['controller' => 'Auth', 'action' => 'login']);
-        }
-
-        // Get current user data for all actions
-        $currentUser = $session->read('Auth.User');
-        $this->set('currentUser', $currentUser);
-    }
-
-    public function index()
-    {
-        $usersTable = $this->fetchTable('Users');
-        $users = $this->paginate($usersTable);
-        $this->set(compact('users'));
+        $this->set(compact('todos'));
     }
 
     public function view($id = null)
     {
-        $usersTable = $this->fetchTable('Users');
-        $user = $usersTable->get($id, [
-            'contain' => [],
-        ]);
-        $this->set(compact('user'));
+        $todo = $this->Todos->get($id, contain: []);
+
+        $this->set(compact('todo'));
     }
 
     public function add()
     {
-        $usersTable = $this->fetchTable('Users');
-        $user = $usersTable->newEmptyEntity();
+        $todo = $this->Todos->newEmptyEntity();
         if ($this->request->is('post')) {
-            $user = $usersTable->patchEntity($user, $this->request->getData());
-            if ($usersTable->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
+            $todo = $this->Todos->patchEntity($todo, $this->request->getData());
+            if ($this->Todos->save($todo)) {
+                $this->Flash->success(__('The todo has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            $this->Flash->error(__('The todo could not be saved. Please, try again.'));
         }
-        $this->set(compact('user'));
+
+        $this->set(compact('todo'));
     }
 
     public function edit($id = null)
     {
-
-
-        // Check if ID is provided
-        if ($id === null) {
-            $this->Flash->error(__('Invalid user ID.'));
-            return $this->redirect(['action' => 'index']);
-        }
-
-        $usersTable = $this->fetchTable('Users');
-
-        try {
-            $user = $usersTable->get($id, [
-                'contain' => [],
-            ]);
-        } catch (\Exception $e) {
-            $this->Flash->error(__('User not found.'));
-            return $this->redirect(['action' => 'index']);
-        }
-
+        $todo = $this->Todos->get($id, contain: []);
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $user = $usersTable->patchEntity($user, $this->request->getData());
-            if ($usersTable->save($user)) {
-                $this->Flash->success(__('The user has been saved.'));
+            $todo = $this->Todos->patchEntity($todo, $this->request->getData());
+            if ($this->Todos->save($todo)) {
+                $this->Flash->success(__('The todo has been saved.'));
+
                 return $this->redirect(['action' => 'index']);
             }
-            $this->Flash->error(__('The user could not be saved. Please, try again.'));
+            $this->Flash->error(__('The todo could not be saved. Please, try again.'));
         }
-        $this->set(compact('user'));
+
+        $this->set(compact('todo'));
     }
 
     public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-
-        // Check if ID is provided
-        if ($id === null) {
-            $this->Flash->error(__('Invalid user ID.'));
-            return $this->redirect(['action' => 'index']);
-        }
-
-        $usersTable = $this->fetchTable('Users');
-
-        try {
-            $user = $usersTable->get($id);
-        } catch (\Exception $e) {
-            $this->Flash->error(__('User not found.'));
-            return $this->redirect(['action' => 'index']);
-        }
-
-        if ($usersTable->delete($user)) {
-            $this->Flash->success(__('The user has been deleted.'));
+        $todo = $this->Todos->get($id);
+        if ($this->Todos->delete($todo)) {
+            $this->Flash->success(__('The todo has been deleted.'));
         } else {
-            $this->Flash->error(__('The user could not be deleted. Please, try again.'));
+            $this->Flash->error(__('The todo could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);
@@ -8790,9 +8381,6 @@ class UsersController extends AppController
 }
 
 ```
-
-</details>
-
 
 </details>
 
@@ -8811,763 +8399,194 @@ class UsersController extends AppController
 │   │   └── login.php                 # User login form
 │   ├── Dashboard/
 │   │   └── index.php                 # Dashboard with sidebar navigation
-│   └── Users/
+│   └── Todos/
 │       ├── index.php                 # Users listing table
 │       ├── add.php                   # Add new user form
 │       ├── edit.php                  # Edit user form
 │       └── view.php                  # View user details
 ```
 
-<details>
-<summary>layout\default.php</summary>
-
 ```php
-<?php
-/**
- * CakePHP Learning Lab - Default Layout
- * This layout will be used across all pages in the application.
- * Contains: Header navigation, common CSS, HTML structure
- */
-?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <?= $this->Html->charset() ?>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><?= $this->fetch('title') ?></title>
-    <?= $this->Html->meta('icon') ?>
-    <?= $this->Html->css('style') ?>
-    <meta name="description" content="CakePHP Learning Lab - Learning CakePHP through practical implementation">
-    <?= $this->fetch('meta') ?>
-    <?= $this->fetch('css') ?>
-    <?= $this->fetch('script') ?>
-</head>
-<body>
-    <!-- Navigation Header -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <!-- Left side: Project name -->
-            <a href="<?= $this->Url->build('/') ?>" class="logo">
-                CakePHP Lab
-            </a>
-            <!-- Right side: Login/Signup links or User menu -->
-            <ul class="nav-links">
-                <?php if ($this->request->getSession()->check('Auth.User')): ?>
-                    <?php $user = $this->request->getSession()->read('Auth.User'); ?>
-                    <li><span class="welcome-text">Welcome, <?= h($user['name']) ?>!</span></li>
-                    <li><a href="<?= $this->Url->build('/logout') ?>" class="nav-link">Logout</a></li>
-                <?php else: ?>
-                    <li><a href="<?= $this->Url->build('/login') ?>" class="nav-link">Login</a></li>
-                    <li><a href="<?= $this->Url->build('/signup') ?>" class="btn btn-primary">Sign Up</a></li>
-                <?php endif; ?>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Flash Messages -->
-    <?= $this->Flash->render() ?>
-    <!-- Page Content -->
-    <?= $this->fetch('content') ?>
-
-</body>
-</html>
-
+bin/cake bake template Todos
 ```
 
-</details>
-
 <details>
-<summary>pages\home.php</summary>
-
-```php
-<?php
-/**
- * Home Page - CakePHP Learning Lab
- * Common elements (header, CSS, HTML structure) are in the default layout.
-*/
-// Set page title
-$this->assign('title', 'Home - CakePHP Lab');
-?>
-
-<!-- Features Section -->
-<section class="features">
-    <div class="container">
-        <h2 style="text-align: center; color: #2c3e50; margin-bottom: 1rem;">What I'm Learning</h2>
-        <p style="text-align: center; color: #666; max-width: 600px; margin: 0 auto;">
-            This project helps me understand CakePHP concepts through hands-on practice with real features.
-        </p>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Authentication System</h3>
-                <p>Complete user registration, login, logout, and session management with CakePHP's Authentication plugin.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>CRUD Operations</h3>
-                <p>Full Create, Read, Update, Delete functionality with form handling, validation, and database operations.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>MVC Architecture</h3>
-                <p>Understand CakePHP's Model-View-Controller pattern and convention over configuration approach.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>ORM & Database</h3>
-                <p>Learn CakePHP's powerful ORM, migrations, associations, and advanced database operations.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>Templating System</h3>
-                <p>Master CakePHP's templating engine, helpers, elements, and creating dynamic user interfaces.</p>
-            </div>
-
-            <div class="feature-card">
-                <h3>Modern Development</h3>
-                <p>Best practices, security, testing, and deployment strategies for professional CakePHP applications.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Technology Stack Section -->
-<section class="tech-stack">
-    <div class="container">
-        <h2 style="color: #2c3e50; margin-bottom: 1rem;">Tech Stack I'm Using</h2>
-        <p style="color: #666; margin-bottom: 2rem;">Technologies I'm practicing with in this project</p>
-
-        <div class="tech-grid">
-            <div class="tech-item">CakePHP 5.x</div>
-            <div class="tech-item">PHP 8.1+</div>
-            <div class="tech-item">MySQL</div>
-            <div class="tech-item">HTML5</div>
-            <div class="tech-item">CSS3</div>
-            <div class="tech-item">JavaScript</div>
-        </div>
-    </div>
-</section>
-
-```
-
-</details>
-
-<details>
-<summary>auth\signup.php</summary>
-
-```php
-<?php
-$this->assign('title', 'Sign Up - CakePHP Learning Lab');
-?>
-
-<div class="auth-container">
-    <div class="auth-card">
-        <h3>Create Account</h3>
-
-        <?= $this->Form->create($user, [
-            'type' => 'post',
-            'class' => 'auth-form'
-        ]) ?>
-
-        <div class="form-group">
-            <?= $this->Form->control('name', [
-                'type' => 'text',
-                'label' => 'Full Name',
-                'placeholder' => 'Enter your full name',
-                'required' => true,
-                'class' => 'form-control'
-            ]) ?>
-        </div>
-
-        <div class="form-group">
-            <?= $this->Form->control('email', [
-                'type' => 'email',
-                'label' => 'Email Address',
-                'placeholder' => 'Enter your email',
-                'required' => true,
-                'class' => 'form-control'
-            ]) ?>
-        </div>
-
-        <div class="form-group">
-            <?= $this->Form->control('password', [
-                'type' => 'password',
-                'label' => 'Password',
-                'placeholder' => 'Create a password',
-                'required' => true,
-                'class' => 'form-control'
-            ]) ?>
-        </div>
-
-        <div class="form-group">
-            <?= $this->Form->control('confirm_password', [
-                'type' => 'password',
-                'label' => 'Confirm Password',
-                'placeholder' => 'Confirm your password',
-                'required' => true,
-                'class' => 'form-control'
-            ]) ?>
-        </div>
-
-        <div class="form-actions">
-            <?= $this->Form->button('Create Account', [
-                'type' => 'submit',
-                'class' => 'btn btn-primary btn-full'
-            ]) ?>
-        </div>
-
-        <?= $this->Form->end() ?>
-
-        <div class="auth-links">
-            <p>Already have an account?
-                <a href="<?= $this->Url->build('/login') ?>">Login</a>
-            </p>
-        </div>
-    </div>
-</div>
-
-
-```
-
-</details>
-
-<details>
-<summary>auth\login.php</summary>
+<summary>Todos\index.php</summary>
 
 ```php
 <?php
 /**
  * @var \App\View\AppView $this
+ * @var iterable<\App\Model\Entity\Todo> $todos
  */
 ?>
-
-<div class="auth-container">
-    <div class="auth-card">
-        <h2>Login</h2>
-        <p>Enter your credentials to access your account</p>
-
-        <?= $this->Form->create(null, [
-            'type' => 'post',
-            'class' => 'auth-form'
-        ]) ?>
-
-        <div class="form-group">
-            <?= $this->Form->control('email', [
-                'type' => 'email',
-                'label' => 'Email Address',
-                'required' => true,
-                'placeholder' => 'Enter your email',
-                'class' => 'form-control'
-            ]) ?>
-        </div>
-
-        <div class="form-group">
-            <?= $this->Form->control('password', [
-                'type' => 'password',
-                'label' => 'Password',
-                'required' => true,
-                'placeholder' => 'Enter your password',
-                'class' => 'form-control'
-            ]) ?>
-        </div>
-
-        <div class="form-group">
-            <label class="checkbox-container">
-                <?= $this->Form->checkbox('remember_me', ['hiddenField' => false]) ?>
-                <span class="checkmark"></span>
-                Remember me
-            </label>
-        </div>
-
-        <div class="form-actions">
-            <?= $this->Form->button('Login', [
-                'type' => 'submit',
-                'class' => 'btn btn-primary btn-block'
-            ]) ?>
-        </div>
-
-        <?= $this->Form->end() ?>
-
-        <div class="auth-links">
-            <p>Don't have an account? <?= $this->Html->link('Sign up here', '/signup') ?></p>
-            <p><?= $this->Html->link('Forgot your password?', '#') ?></p>
-        </div>
-    </div>
-</div>
-
-
-```
-
-</details>
-
-<details>
-<summary>Dashboard\index.php</summary>
-
-```php
-<?php
-$this->assign('title', 'Dashboard - CakePHP Learning Lab');
-?>
-
-<div class="dashboard-layout">
-    <!-- Left Sidebar - 10% width -->
-    <div class="dashboard-sidebar">
-        <nav class="sidebar-nav">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link active">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link">
-                        Users
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <!-- Right Content Area - 90% width -->
-    <div class="dashboard-content">
-        <!-- Dashboard Section -->
-        <div class="dashboard-content-main">
-            <div class="dashboard-header">
-                <h1>Welcome to Your Dashboard</h1>
-                <p>Hello, <strong><?= h($currentUser['name']) ?></strong>! You're successfully logged in.</p>
-            </div>
-
-            <div class="dashboard-grid">
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- No JavaScript needed since Users link navigates to separate controller -->
-
-
-```
-
-</details>
-
-<details>
-<summary>Users\index.php</summary>
-
-```php
-
-<?php
-/**
- * @var \App\View\AppView $this
- * @var iterable<\App\Model\Entity\User> $users
- * @var \App\Model\Entity\User $currentUser
- */
-$this->assign('title', 'Users Management - CakePHP Learning Lab');
-?>
-
-<div class="dashboard-layout">
-    <!-- Left Sidebar - 10% width -->
-    <div class="dashboard-sidebar">
-        <nav class="sidebar-nav">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
-                        Users
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <!-- Right Content Area - 90% width -->
-    <div class="dashboard-content">
-        <div class="dashboard-content-main">
-            <div class="dashboard-header">
-                <h1>Users Management</h1>
-                <p>Manage all registered users in the system</p>
-
-            </div>
-
-            <div class="users-actions">
-                <a href="<?= $this->Url->build(['action' => 'add']) ?>" class="btn btn-primary">Add New User</a>
-            </div>
-
-            <?= $this->Flash->render() ?>
-
-            <div class="users-table-container">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th><?= $this->Paginator->sort('id', 'ID') ?></th>
-                            <th><?= $this->Paginator->sort('name', 'Name') ?></th>
-                            <th><?= $this->Paginator->sort('email', 'Email') ?></th>
-                            <th><?= $this->Paginator->sort('created', 'Created') ?></th>
-                            <th class="actions">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($users as $user): ?>
-                        <tr>
-                            <td><?= $this->Number->format($user->id) ?></td>
-                            <td><?= h($user->name) ?></td>
-                            <td><?= h($user->email) ?></td>
-                            <td><?= h($user->created->format('Y-m-d H:i')) ?></td>
-                            <td class="actions">
-                                <div class="action-buttons">
-                                    <a href="<?= $this->Url->build(['action' => 'view', $user->id]) ?>" class="btn-outline">View</a>
-                                    <a href="<?= $this->Url->build(['action' => 'edit', $user->id]) ?>" class="btn-outline">Edit</a>
-                                    <?= $this->Form->postLink(
-                                        'Delete',
-                                        ['action' => 'delete', $user->id],
-                                        [
-                                            'confirm' => __('Are you sure you want to delete user "{0}"?', $user->name),
-                                            'class' => 'btn-outline'
-                                        ]
-                                    ) ?>
-                                </div>
-                            </td>
-                        </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-
-            <?php if ($this->Paginator->counter('{{pages}}') > 1): ?>
-            <div class="paginator">
-                <ul class="pagination">
-                    <?= $this->Paginator->first('<< ' . __('first')) ?>
-                    <?= $this->Paginator->prev('< ' . __('previous')) ?>
-                    <?= $this->Paginator->numbers() ?>
-                    <?= $this->Paginator->next(__('next') . ' >') ?>
-                    <?= $this->Paginator->last(__('last') . ' >>') ?>
-                </ul>
-                <p class="pagination-info">
-                    <?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?>
-                </p>
-            </div>
-            <?php endif; ?>
-
-        </div>
-    </div>
-</div>
-
-```
-
-</details>
-
-<details>
-<summary>Users\add.php</summary>
-
-```php
-<?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\User $user
- * @var \App\Model\Entity\User $currentUser
- */
-$this->assign('title', 'Add User - CakePHP Learning Lab');
-?>
-
-<div class="dashboard-layout">
-    <!-- Left Sidebar - 10% width -->
-    <div class="dashboard-sidebar">
-        <nav class="sidebar-nav">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
-                        Users
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <!-- Right Content Area - 90% width -->
-    <div class="dashboard-content">
-        <div class="dashboard-content-main">
-            <div class="dashboard-header">
-                <h1>Add New User</h1>
-                <p>Create a new user account in the system</p>
-
-            </div>
-
-            <div class="users-actions">
-                <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline">Back to Users List</a>
-            </div>
-
-            <?= $this->Flash->render() ?>
-
-            <div class="form-container">
-                <div class="auth-card">
-                    <?= $this->Form->create($user) ?>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('name', [
-                            'type' => 'text',
-                            'label' => 'Full Name',
-                            'class' => 'form-control',
-                            'placeholder' => 'Enter full name',
-                            'required' => true
-                        ]) ?>
-                    </div>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('email', [
-                            'type' => 'email',
-                            'label' => 'Email Address',
-                            'class' => 'form-control',
-                            'placeholder' => 'Enter email address',
-                            'required' => true
-                        ]) ?>
-                    </div>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('password', [
-                            'type' => 'password',
-                            'label' => 'Password',
-                            'class' => 'form-control',
-                            'placeholder' => 'Enter password',
-                            'required' => true
-                        ]) ?>
-                    </div>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('confirm_password', [
-                            'type' => 'password',
-                            'label' => 'Confirm Password',
-                            'class' => 'form-control',
-                            'placeholder' => 'Confirm password',
-                            'required' => true
-                        ]) ?>
-                    </div>
-
-                    <div class="form-actions">
-                        <?= $this->Form->button('Create User', ['class' => 'btn btn-primary btn-full']) ?>
-                    </div>
-
-                    <?= $this->Form->end() ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-```
-
-</details>
-
-<details>
-<summary>Users\edit.php</summary>
-
-```php
-<?php
-/**
- * @var \App\View\AppView $this
- * @var \App\Model\Entity\User $user
- * @var \App\Model\Entity\User $currentUser
- */
-$this->assign('title', 'Edit User - CakePHP Learning Lab');
-?>
-
-<div class="dashboard-layout">
-    <!-- Left Sidebar - 10% width -->
-    <div class="dashboard-sidebar">
-        <nav class="sidebar-nav">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(url: ['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
-                        Users
-                    </a>
-                </li>
-            </ul>
-        </nav>
-    </div>
-
-    <!-- Right Content Area - 90% width -->
-    <div class="dashboard-content">
-        <div class="dashboard-content-main">
-            <div class="dashboard-header">
-                <h1>Edit User: <?= h($user->name) ?></h1>
-                <p>Update user information in the system</p>
-
-            </div>
-
-            <div class="users-actions">
-                <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline">Back to Users List</a>
-                <a href="<?= $this->Url->build(['action' => 'view', $user->id]) ?>" class="btn btn-outline">View User</a>
-            </div>
-
-            <?= $this->Flash->render() ?>
-
-            <div class="form-container">
-                <div class="auth-card">
-                    <?= $this->Form->create($user) ?>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('name', [
-                            'type' => 'text',
-                            'label' => 'Full Name',
-                            'class' => 'form-control',
-                            'placeholder' => 'Enter full name',
-                            'required' => true
-                        ]) ?>
-                    </div>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('email', [
-                            'type' => 'email',
-                            'label' => 'Email Address',
-                            'class' => 'form-control',
-                            'placeholder' => 'Enter email address',
-                            'required' => true
-                        ]) ?>
-                    </div>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('password', [
-                            'type' => 'password',
-                            'label' => 'New Password (leave blank to keep current)',
-                            'class' => 'form-control',
-                            'placeholder' => 'Enter new password',
-                            'required' => false,
-                            'value' => ''
-                        ]) ?>
-                    </div>
-
-                    <div class="form-group">
-                        <?= $this->Form->control('confirm_password', [
-                            'type' => 'password',
-                            'label' => 'Confirm New Password',
-                            'class' => 'form-control',
-                            'placeholder' => 'Confirm new password',
-                            'required' => false,
-                            'value' => ''
-                        ]) ?>
-                    </div>
-
-                    <div class="form-actions">
-                        <?= $this->Form->button('Update User', ['class' => 'btn btn-primary btn-full']) ?>
-                    </div>
-
-                    <?= $this->Form->end() ?>
-
-                    <div class="form-actions" style="margin-top: 20px; text-align: center;">
+<div class="todos index content">
+    <?= $this->Html->link(__('New Todo'), ['action' => 'add'], ['class' => 'button float-right']) ?>
+    <h3><?= __('Todos') ?></h3>
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th><?= $this->Paginator->sort('id') ?></th>
+                    <th><?= $this->Paginator->sort('title') ?></th>
+                    <th class="actions"><?= __('Actions') ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($todos as $todo): ?>
+                <tr>
+                    <td><?= $this->Number->format($todo->id) ?></td>
+                    <td><?= h($todo->title) ?></td>
+                    <td class="actions">
+                        <?= $this->Html->link(__('View'), ['action' => 'view', $todo->id]) ?>
+                        <?= $this->Html->link(__('Edit'), ['action' => 'edit', $todo->id]) ?>
                         <?= $this->Form->postLink(
-                            'Delete User',
-                            ['action' => 'delete', $user->id],
+                            __('Delete'),
+                            ['action' => 'delete', $todo->id],
                             [
-                                'confirm' => __('Are you sure you want to delete user "{0}"?', $user->name),
-                                'class' => 'btn btn-outline'
+                                'method' => 'delete',
+                                'confirm' => __('Are you sure you want to delete # {0}?', $todo->id),
                             ]
                         ) ?>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <div class="paginator">
+        <ul class="pagination">
+            <?= $this->Paginator->first('<< ' . __('first')) ?>
+            <?= $this->Paginator->prev('< ' . __('previous')) ?>
+            <?= $this->Paginator->numbers() ?>
+            <?= $this->Paginator->next(__('next') . ' >') ?>
+            <?= $this->Paginator->last(__('last') . ' >>') ?>
+        </ul>
+        <p><?= $this->Paginator->counter(__('Page {{page}} of {{pages}}, showing {{current}} record(s) out of {{count}} total')) ?></p>
     </div>
 </div>
-
 
 ```
 
 </details>
 
 <details>
-<summary>Users\view.php</summary>
+<summary>Todos\add.php</summary>
 
 ```php
-
 <?php
 /**
  * @var \App\View\AppView $this
- * @var \App\Model\Entity\User $user
- * @var \App\Model\Entity\User $currentUser
+ * @var \App\Model\Entity\Todo $todo
  */
-$this->assign('title', 'View User - CakePHP Learning Lab');
 ?>
-
-<div class="dashboard-layout">
-    <!-- Left Sidebar - 10% width -->
-    <div class="dashboard-sidebar">
-        <nav class="sidebar-nav">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Dashboard', 'action' => 'index']) ?>" class="nav-link">
-                        Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= $this->Url->build(['controller' => 'Users', 'action' => 'index']) ?>" class="nav-link active">
-                        Users
-                    </a>
-                </li>
-            </ul>
-        </nav>
+<div class="row">
+    <aside class="column">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Html->link(__('List Todos'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+        </div>
+    </aside>
+    <div class="column column-80">
+        <div class="todos form content">
+            <?= $this->Form->create($todo) ?>
+            <fieldset>
+                <legend><?= __('Add Todo') ?></legend>
+                <?php
+                    echo $this->Form->control('title');
+                    echo $this->Form->control('description');
+                ?>
+            </fieldset>
+            <?= $this->Form->button(__('Submit')) ?>
+            <?= $this->Form->end() ?>
+        </div>
     </div>
+</div>
 
-    <!-- Right Content Area - 90% width -->
-    <div class="dashboard-content">
-        <div class="dashboard-content-main">
-            <div class="dashboard-header">
-                <h1>View User: <?= h($user->name) ?></h1>
-                <p>User information details</p>
-            </div>
+```
 
-            <div class="users-actions">
-                <a href="<?= $this->Url->build(['action' => 'index']) ?>" class="btn btn-outline">Back to Users List</a>
-                <a href="<?= $this->Url->build(['action' => 'edit', $user->id]) ?>" class="btn btn-primary">Edit User</a>
-            </div>
+</details>
 
-            <?= $this->Flash->render() ?>
+<details>
+<summary>Todos\edit.php</summary>
 
-            <div class="users-table-container">
-                <table class="table">
-                    <tr>
-                        <th>ID</th>
-                        <td><?= $this->Number->format($user->id) ?></td>
-                    </tr>
-                    <tr>
-                        <th>Full Name</th>
-                        <td><?= h($user->name) ?></td>
-                    </tr>
-                    <tr>
-                        <th>Email Address</th>
-                        <td><?= h($user->email) ?></td>
-                    </tr>
-                    <tr>
-                        <th>Created</th>
-                        <td><?= h($user->created->format('Y-m-d H:i:s')) ?></td>
-                    </tr>
-                    <tr>
-                        <th>Modified</th>
-                        <td><?= h($user->modified->format('Y-m-d H:i:s')) ?></td>
-                    </tr>
-                </table>
-            </div>
+```php
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\Todo $todo
+ */
+?>
+<div class="row">
+    <aside class="column">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Form->postLink(
+                __('Delete'),
+                ['action' => 'delete', $todo->id],
+                ['confirm' => __('Are you sure you want to delete # {0}?', $todo->id), 'class' => 'side-nav-item']
+            ) ?>
+            <?= $this->Html->link(__('List Todos'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+        </div>
+    </aside>
+    <div class="column column-80">
+        <div class="todos form content">
+            <?= $this->Form->create($todo) ?>
+            <fieldset>
+                <legend><?= __('Edit Todo') ?></legend>
+                <?php
+                    echo $this->Form->control('title');
+                    echo $this->Form->control('description');
+                ?>
+            </fieldset>
+            <?= $this->Form->button(__('Submit')) ?>
+            <?= $this->Form->end() ?>
+        </div>
+    </div>
+</div>
 
-            <div class="users-actions">
-                <?= $this->Form->postLink(
-                    'Delete User',
-                    ['action' => 'delete', $user->id],
-                    [
-                        'confirm' => __('Are you sure you want to delete user "{0}"?', $user->name),
-                        'class' => 'btn btn-outline'
-                    ]
-                ) ?>
+```
+
+</details>
+
+<details>
+<summary>Todos\view.php</summary>
+
+```php
+<?php
+/**
+ * @var \App\View\AppView $this
+ * @var \App\Model\Entity\Todo $todo
+ */
+?>
+<div class="row">
+    <aside class="column">
+        <div class="side-nav">
+            <h4 class="heading"><?= __('Actions') ?></h4>
+            <?= $this->Html->link(__('Edit Todo'), ['action' => 'edit', $todo->id], ['class' => 'side-nav-item']) ?>
+            <?= $this->Form->postLink(__('Delete Todo'), ['action' => 'delete', $todo->id], ['confirm' => __('Are you sure you want to delete # {0}?', $todo->id), 'class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('List Todos'), ['action' => 'index'], ['class' => 'side-nav-item']) ?>
+            <?= $this->Html->link(__('New Todo'), ['action' => 'add'], ['class' => 'side-nav-item']) ?>
+        </div>
+    </aside>
+    <div class="column column-80">
+        <div class="todos view content">
+            <h3><?= h($todo->title) ?></h3>
+            <table>
+                <tr>
+                    <th><?= __('Title') ?></th>
+                    <td><?= h($todo->title) ?></td>
+                </tr>
+                <tr>
+                    <th><?= __('Id') ?></th>
+                    <td><?= $this->Number->format($todo->id) ?></td>
+                </tr>
+            </table>
+            <div class="text">
+                <strong><?= __('Description') ?></strong>
+                <blockquote>
+                    <?= $this->Text->autoParagraph(h($todo->description)); ?>
+                </blockquote>
             </div>
         </div>
     </div>
@@ -9581,399 +8600,6 @@ $this->assign('title', 'View User - CakePHP Learning Lab');
 
 </details>
 
-<details>
-<summary>CSS</summary>
-
-```text
-└── webroot/
-    └── css/
-        └── style.css                 # Clean white/black styling
-```
-
-```css
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: black;
-    background: white;
-}
-
-/* Header */
-.navbar {
-    background: white;
-    padding: 20px 0;
-    border-bottom: 1px solid black;
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo {
-    font-size: 24px;
-    font-weight: bold;
-    color: black;
-    text-decoration: none;
-}
-
-.nav-links {
-    display: flex;
-    gap: 30px;
-    list-style: none;
-    align-items: center;
-}
-
-.nav-link {
-    text-decoration: none;
-    color: black;
-}
-
-.nav-link:hover {
-    text-decoration: underline;
-}
-
-/* Buttons */
-.btn {
-    padding: 12px 24px;
-    text-decoration: none;
-    border: 1px solid black;
-    background: white;
-    color: black;
-    display: inline-block;
-    cursor: pointer;
-    font-size: 16px;
-}
-
-.btn:hover {
-    background: black;
-    color: white;
-    text-decoration: none;
-}
-
-.btn-primary {
-    background: black;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: white;
-    color: black;
-}
-
-.btn-full {
-    width: 100%;
-}
-
-.btn-outline {
-    background: white;
-    border: 1px solid black;
-    color: black;
-    padding: 8px 16px;
-    text-decoration: none;
-    font-size: 12px;
-    margin-right: 5px;
-    cursor: pointer;
-}
-
-.btn-outline:hover {
-    background: black;
-    color: white;
-    text-decoration: none;
-}
-
-/* Forms */
-.auth-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    padding: 20px;
-}
-
-.auth-card {
-    background: white;
-    padding: 40px;
-    border: 1px solid black;
-    width: 100%;
-    max-width: 400px;
-}
-
-.auth-card h3 {
-    text-align: center;
-    margin-bottom: 10px;
-    color: black;
-    font-size: 28px;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: black;
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid black;
-    font-size: 16px;
-    background: white;
-    color: black;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: black;
-}
-
-.auth-links {
-    text-align: center;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid black;
-}
-
-.auth-links a {
-    color: black;
-    text-decoration: none;
-}
-
-.auth-links a:hover {
-    text-decoration: underline;
-}
-
-/* Dashboard Layout */
-.dashboard-layout {
-    display: flex;
-    min-height: 80vh;
-}
-
-.dashboard-sidebar {
-    width: 10%;
-    background: white;
-    border-right: 1px solid black;
-    padding: 20px 0;
-}
-
-.sidebar-nav .nav-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.nav-item {
-    margin-bottom: 5px;
-}
-
-.nav-link {
-    display: block;
-    padding: 15px 20px;
-    color: black;
-    text-decoration: none;
-    border-left: 3px solid transparent;
-}
-
-.nav-link:hover {
-    background: white;
-    color: black;
-    text-decoration: none;
-    border-left-color: black;
-}
-
-.nav-link.active {
-    background: white;
-    color: black;
-    border-left-color: black;
-}
-
-.dashboard-content {
-    width: 90%;
-    padding: 40px;
-    background: white;
-}
-
-.dashboard-header {
-    text-align: center;
-    margin-bottom: 40px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid black;
-}
-
-.dashboard-header h1 {
-    font-size: 32px;
-    margin-bottom: 10px;
-    color: black;
-}
-
-.dashboard-header p {
-    font-size: 16px;
-    color: black;
-}
-
-/* Tables */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-.table th,
-.table td {
-    padding: 15px;
-    text-align: left;
-    border-bottom: 1px solid black;
-    color: black;
-}
-
-.table th {
-    background: white;
-    font-weight: bold;
-    border-bottom: 2px solid black;
-}
-
-.table tbody tr:hover {
-    background: white;
-}
-
-/* Users Management */
-.users-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid black;
-}
-
-.users-header h1 {
-    margin: 0;
-    color: black;
-}
-
-.users-actions {
-    display: flex;
-    gap: 1rem;
-}
-
-.users-table-container {
-    background: white;
-    border: 1px solid black;
-    margin-bottom: 2rem;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-/* Container */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Pagination */
-.paginator {
-    text-align: center;
-    margin-top: 2rem;
-}
-
-.pagination {
-    list-style: none;
-    display: inline-flex;
-    gap: 0.5rem;
-    margin: 0 0 1rem 0;
-    padding: 0;
-}
-
-.pagination li a,
-.pagination li span {
-    display: block;
-    padding: 0.5rem 0.75rem;
-    text-decoration: none;
-    color: black;
-    border: 1px solid black;
-}
-
-.pagination li a:hover {
-    background: black;
-    color: white;
-}
-
-.pagination li.active span {
-    background: black;
-    color: white;
-}
-
-.pagination-info {
-    color: black;
-    font-size: 0.9rem;
-    margin: 0;
-}
-
-/* Users Table Container */
-.users-table-container {
-    background: white;
-    border: 1px solid black;
-    margin-bottom: 2rem;
-}
-
-/* Form Container */
-.form-container {
-    max-width: 600px;
-    margin: 2rem auto 0;
-}
-
-.form-actions {
-    margin-top: 30px;
-}
-
-/* Mobile Responsive */
-@media (max-width: 768px) {
-    .dashboard-layout {
-        flex-direction: column;
-    }
-
-    .dashboard-sidebar {
-        width: 100%;
-        border-right: none;
-        border-bottom: 1px solid black;
-    }
-
-    .dashboard-content {
-        width: 100%;
-        padding: 20px;
-    }
-
-    .users-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-
-    .action-buttons {
-        flex-direction: column;
-    }
-}
-
-```
-
-</details>
 
 
 
